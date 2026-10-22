@@ -5,3 +5,5 @@ packages:
 # Dépendances autorisées à exécuter des scripts d'installation (binaires natifs)
 onlyBuiltDependencies:
   - esbuild
+  - sharp
+  - unrs-resolver
