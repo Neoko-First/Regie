@@ -23,6 +23,9 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Prisma 7** : l'URL de connexion vit dans `prisma.config.ts` (plus dans le schéma), le client est généré dans `apps/api/src/generated/prisma` en CommonJS et se connecte via `@prisma/adapter-pg`. `prisma init` installe des « skills » d'agents (`.agents/`, `.claude/`, `.windsurf/`) : ne pas les commiter.
 - **Build Nest** : `incremental` est désactivé dans `tsconfig.build.json`, sinon `nest start --watch` peut ne rien émettre après la suppression de `dist/`.
 - **Valeurs connues seulement côté client** (thème stocké…) : utiliser `useIsClient()` pour éviter les erreurs d'hydratation.
+- **Lire l'URL côté client** (`usePathname`, `useSearchParams`) dans un composant partagé (layout, sidebar) exige un `<Suspense>` autour, sinon le build échoue sur les routes dynamiques.
+- **Coquille** : `SidebarInset` porte `min-w-0`, sinon un contenu large (board) élargit toute la page.
+- **Ajout du plugin Tailwind typography** : redémarrer le serveur de dev après avoir modifié les `@plugin` de `globals.css`.
 - **Composants `components/ui/`** : générés par shadcn, modifiés uniquement pour la traduction française des libellés, la variante `success` du `Button` et la conformité au lint. Après un `shadcn add`, retraduire les libellés anglais.
 
 ## Authentification (phase 3)

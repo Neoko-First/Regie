@@ -8,7 +8,7 @@
 | **Porteur** | Alexandre |
 | **Statut du projet** | Développement du POC |
 | **Dernière mise à jour** | 2026-10-22 |
-| **Version du document** | 0.18 |
+| **Version du document** | 0.19 |
 
 ---
 
@@ -677,3 +677,4 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-22 | 0.16 | Démarrage du développement du POC : D-078 (stack), D-079 (auth du POC), D-080 (libellé « Évolution » + ID par espace), D-081 (MCP dans l'API Nest). Q-007 résolue. |
 | 2026-10-22 | 0.17 | Noyau d'auth livré (D-079) : jetons, sessions, verrouillage, CSRF. Ajout de D-082 (pas d'inscription publique). |
 | 2026-10-22 | 0.18 | Domaine livré côté API (phase 4) : espaces, membres, évolutions, workflow, gates, révisions, commentaires, historique. Ajout de D-083 à D-085. |
+| 2026-10-22 | 0.19 | UI de la boucle Change (phase 5) : Ma boîte (gates à valider, assignations), board et liste filtrables, page évolution (Proposal · Plan · Tasks · Discussion · Historique), actions de gate. Q-023 : point d'entrée « Ma boîte », projet = filtre. |
