@@ -33,6 +33,15 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Tests e2e** (`pnpm --filter @regie/api test:e2e`) : base PostgreSQL réelle, app servie sous `/api` comme derrière le BFF. À enrichir pour toute modification de l'auth.
 - **Préchargement serveur** : `lib/server/prefetch.tsx` (`<Prefetch>`) sous un `<Suspense>` ; un Server Component ne peut pas rafraîchir la session, c'est le client qui prend le relais sur 401.
 
+## Domaine (phase 4)
+
+- **Le workflow est défini une seule fois** dans `packages/shared/src/domain/workflow.ts` (`TRANSITIONS`, `checkTransition`). L'API l'applique (`ChangeWorkflowService`), l'UI s'en sert pour afficher les boutons. Ne jamais coder une règle de transition ailleurs.
+- **Règles des gates** : rôle requis (PO / Lead tech / Recetteur), jamais un agent (`AuthContext.isAgent`), jamais l'auteur de l'évolution. Chaque gate fige une `Revision` immuable et une `GateApproval`.
+- **Accès** : toute route d'une évolution passe par `ChangeAccessService.requireAccess` (404 si l'utilisateur n'est pas membre de l'espace) ; les écritures exigent un rôle contributeur (`SpaceAccessService.assertRoles`).
+- **Concurrence** : une transition envoie `fromStatus` ; l'API refuse (409) si le statut a changé, et la mise à jour est conditionnée au statut en base.
+- **Identifiants** : `SOC-12` = clé d'espace + numéro attribué atomiquement (`Space.changeCounter`).
+- **Administrateur de la plateforme** (`User.isPlatformAdmin`) : crée les espaces, a le rôle ADMIN partout, mais aucun rôle métier (il ne valide pas de gate à ce titre).
+
 ## Versions figées volontairement
 
 | Outil       | Version | Raison                                          |
