@@ -2,6 +2,11 @@
 export interface AuthContext {
   userId: string;
   sessionId: string;
+  /**
+   * Vrai quand la requête vient d'un agent IA agissant par délégation (MCP, phase 6).
+   * Un agent ne peut jamais valider un gate (D-009).
+   */
+  isAgent: boolean;
 }
 
 /** Contenu (claims) de l'access token JWT. */

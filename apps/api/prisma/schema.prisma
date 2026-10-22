@@ -4,8 +4,8 @@
 // soft delete (deletedAt) pour les données métier importantes.
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
   // NestJS compile en CommonJS
   moduleFormat        = "cjs"
   importFileExtension = ""
@@ -25,6 +25,8 @@ model User {
   name             String
   /// Hash argon2id : le mot de passe n'est jamais stocké ni renvoyé
   passwordHash     String
+  /// Administrateur de la plateforme : crée les espaces et en nomme les admins
+  isPlatformAdmin  Boolean   @default(false)
   /// Échecs de connexion consécutifs, remis à zéro après une connexion réussie
   failedLoginCount Int       @default(0)
   /// Verrouillage temporaire après trop d'échecs consécutifs
@@ -33,7 +35,13 @@ model User {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  sessions Session[]
+  sessions        Session[]
+  memberships     Membership[]
+  authoredChanges Change[]       @relation("ChangeAuthor")
+  assignedChanges Change[]       @relation("ChangeAssignee")
+  gateApprovals   GateApproval[]
+  comments        Comment[]
+  activities      Activity[]
 }
 
 /// Session = un appareil connecté. Elle regroupe la « famille » de refresh tokens issus
@@ -71,4 +79,189 @@ model RefreshToken {
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
+}
+
+// ─── Domaine : espaces et évolutions (D-005, D-069) ──────────────────────────
+// Les valeurs des enums sont identiques à celles de @regie/shared (source de vérité du workflow).
+
+enum SpaceRole {
+  ADMIN
+  PO
+  LEAD_TECH
+  DEV
+  TESTER
+  READER
+}
+
+enum ChangeStatus {
+  DRAFT
+  IN_REVIEW
+  DESIGN
+  IN_DEVELOPMENT
+  IN_TESTING
+  ACCEPTED
+  DELIVERED
+  ARCHIVED
+}
+
+enum ChangeNature {
+  EVOLUTION
+  MODIFICATION
+  CORRECTION
+  CATCH_UP
+  TAKEOVER
+}
+
+enum ChangePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Gate {
+  FUNCTIONAL
+  TECHNICAL
+  ACCEPTANCE
+}
+
+enum ActivityType {
+  CREATED
+  UPDATED
+  STATUS_CHANGED
+  GATE_APPROVED
+  COMMENTED
+}
+
+/// Espace métier (Socle, Paie, RFE…) : regroupe les évolutions et porte les droits (D-069).
+model Space {
+  id            String    @id @default(uuid(7))
+  /// Clé courte des identifiants d'évolution (« SOC » → SOC-12), immuable
+  key           String    @unique
+  name          String
+  description   String    @default("")
+  /// Dernier numéro d'évolution attribué dans l'espace (incrémenté atomiquement)
+  changeCounter Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  memberships Membership[]
+  changes     Change[]
+}
+
+/// Appartenance d'un utilisateur à un espace, avec des rôles cumulables (D-063).
+model Membership {
+  id        String      @id @default(uuid(7))
+  spaceId   String
+  userId    String
+  roles     SpaceRole[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, userId])
+  @@index([userId])
+}
+
+/// Évolution (« Change ») : l'unité de travail, de l'idée à la prod.
+model Change {
+  id         String         @id @default(uuid(7))
+  spaceId    String
+  /// Numéro dans l'espace : l'identifiant lisible est `${space.key}-${number}`
+  number     Int
+  title      String
+  nature     ChangeNature   @default(EVOLUTION)
+  priority   ChangePriority @default(MEDIUM)
+  status     ChangeStatus   @default(DRAFT)
+  /// Pourquoi et quoi (markdown)
+  proposal   String         @default("")
+  /// Comment technique (markdown)
+  plan       String         @default("")
+  /// Plan découpé en étapes (markdown)
+  tasks      String         @default("")
+  /// Dernière révision figée par un gate (0 = aucune)
+  revision   Int            @default(0)
+  authorId   String
+  assigneeId String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  deletedAt  DateTime?
+
+  space         Space          @relation(fields: [spaceId], references: [id])
+  author        User           @relation("ChangeAuthor", fields: [authorId], references: [id])
+  assignee      User?          @relation("ChangeAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  revisions     Revision[]
+  gateApprovals GateApproval[]
+  comments      Comment[]
+  activities    Activity[]
+
+  @@unique([spaceId, number])
+  @@index([spaceId, status])
+  @@index([assigneeId])
+}
+
+/// Révision figée d'une évolution, créée à chaque passage de gate (D-010). Immuable.
+model Revision {
+  id        String   @id @default(uuid(7))
+  changeId  String
+  number    Int
+  gate      Gate
+  /// Contenu de l'évolution au moment du gate (titre, nature, proposal, plan, tasks)
+  snapshot  Json
+  createdAt DateTime @default(now())
+
+  change       Change        @relation(fields: [changeId], references: [id], onDelete: Cascade)
+  gateApproval GateApproval?
+
+  @@unique([changeId, number])
+}
+
+/// Trace d'une validation humaine de gate : qui, quand, sur quelle révision (D-009).
+model GateApproval {
+  id           String   @id @default(uuid(7))
+  changeId     String
+  revisionId   String   @unique
+  gate         Gate
+  approvedById String
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  change     Change   @relation(fields: [changeId], references: [id], onDelete: Cascade)
+  revision   Revision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  approvedBy User     @relation(fields: [approvedById], references: [id])
+
+  @@index([changeId])
+}
+
+model Comment {
+  id        String    @id @default(uuid(7))
+  changeId  String
+  authorId  String
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  change Change @relation(fields: [changeId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id])
+
+  @@index([changeId])
+}
+
+/// Historique d'une évolution (onglet Activité). Ajout seul, jamais modifié.
+model Activity {
+  id        String       @id @default(uuid(7))
+  changeId  String
+  actorId   String
+  type      ActivityType
+  data      Json         @default("{}")
+  createdAt DateTime     @default(now())
+
+  change Change @relation(fields: [changeId], references: [id], onDelete: Cascade)
+  actor  User   @relation(fields: [actorId], references: [id])
+
+  @@index([changeId, createdAt])
 }
