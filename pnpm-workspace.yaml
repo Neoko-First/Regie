@@ -7,3 +7,10 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
   - unrs-resolver
+  - prisma
+  - "@prisma/engines"
+  - "@parcel/watcher"
+
+# Scripts volontairement bloqués (télémétrie)
+ignoredBuiltDependencies:
+  - "@scarf/scarf"

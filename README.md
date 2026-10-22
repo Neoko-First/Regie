@@ -20,15 +20,17 @@ Plateforme interne Xotis où chaque évolution d'un produit naît, se valide, se
 ```bash
 pnpm install
 pnpm db:up      # PostgreSQL sur le port 5433, Mailpit sur http://localhost:8025
-pnpm dev
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+pnpm dev        # front sur http://localhost:3000, API sur http://localhost:4000
 ```
 
 ## Structure
 
 ```
 apps/
-  web/        # Next.js (à venir)
-  api/        # NestJS (à venir)
+  web/        # Next.js (front + proxy BFF)
+  api/        # NestJS + Prisma (API)
 packages/
   shared/     # Schémas Zod, types, constantes, codes d'erreur partagés
   config/     # Configs TypeScript, ESLint, Prettier
