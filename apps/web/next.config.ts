@@ -8,8 +8,9 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // N'expose pas la techno du serveur
   poweredByHeader: false,
-  // L'indicateur de dev de Next masquait le sélecteur de thème (bas gauche de la sidebar)
-  devIndicators: { position: "bottom-right" },
+  // L'indicateur flottant de Next masquait des éléments de l'interface ; les erreurs
+  // restent signalées par l'overlay de développement et la console.
+  devIndicators: false,
   turbopack: {
     rules: {
       "*.css": {

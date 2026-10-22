@@ -49,8 +49,8 @@ export function QueryProvider({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={getQueryClient()}>
       {children}
-      {/* En haut à droite : les coins du bas sont pris par la sidebar, les toasts et Next */}
-      <ReactQueryDevtools buttonPosition="top-right" />
+      {/* En bas à droite : le haut est réservé aux actions des pages, le bas gauche à la sidebar */}
+      <ReactQueryDevtools buttonPosition="bottom-right" />
     </QueryClientProvider>
   );
 }

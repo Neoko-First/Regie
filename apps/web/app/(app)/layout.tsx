@@ -3,6 +3,8 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { meQuery } from "@/features/auth/api";
+import { CreateChangeDialog } from "@/features/changes/components/create-change-dialog";
+import { spacesQuery } from "@/features/spaces/api";
 import { UserMenu, UserMenuSkeleton } from "@/features/auth/components/user-menu";
 import { Prefetch } from "@/lib/server/prefetch";
 
@@ -24,8 +26,15 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
           </Suspense>
         }
       />
-      <SidebarInset>{children}</SidebarInset>
+      {/* min-w-0 : un contenu large (board) défile dans la page au lieu d'élargir la coquille */}
+      <SidebarInset className="min-w-0">{children}</SidebarInset>
       <CommandPalette />
+      {/* Modale « Nouvelle évolution », ouverte depuis les pages et la palette ⌘K */}
+      <Suspense fallback={null}>
+        <Prefetch requests={[{ query: spacesQuery(), path: "/spaces" }]}>
+          <CreateChangeDialog />
+        </Prefetch>
+      </Suspense>
     </SidebarProvider>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import { Plus } from "lucide-react";
 import { useEffect } from "react";
 import {
   Command,
@@ -14,6 +15,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useCommandPaletteStore } from "@/stores/command-palette-store";
+import { useCreateChangeStore } from "@/stores/create-change-store";
 import { NAV_ITEMS } from "./nav-items";
 import { THEME_OPTIONS } from "./theme-options";
 
@@ -30,6 +32,7 @@ export function CommandPalette() {
   const open = useCommandPaletteStore((s) => s.open);
   const setOpen = useCommandPaletteStore((s) => s.setOpen);
   const toggle = useCommandPaletteStore((s) => s.toggle);
+  const openCreateChange = useCreateChangeStore((s) => s.setOpen);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -55,6 +58,16 @@ export function CommandPalette() {
         <CommandInput placeholder="Rechercher une page ou une action…" />
         <CommandList>
           <CommandEmpty>Aucun résultat.</CommandEmpty>
+          <CommandGroup heading="Actions">
+            <CommandItem
+              value="Nouvelle évolution créer"
+              onSelect={() => run(() => openCreateChange(true))}
+            >
+              <Plus />
+              <span>Nouvelle évolution</span>
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
           <CommandGroup heading="Navigation">
             {NAV_ITEMS.map(({ href, label, description, icon: Icon }) => (
               <CommandItem
