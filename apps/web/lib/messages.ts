@@ -8,6 +8,7 @@ export const MESSAGES = {
   errors: {
     generic: "Une erreur est survenue. Réessayez dans un instant.",
     network: "Impossible de joindre le serveur. Vérifiez votre connexion.",
+    unavailable: "Le service est momentanément indisponible. Réessayez dans quelques instants.",
     refresh: "Les données affichées n'ont pas pu être actualisées.",
     unauthenticated: "Votre session a expiré. Reconnectez-vous.",
     forbidden: "Vous n'avez pas les droits pour effectuer cette action.",

@@ -44,6 +44,9 @@ function buildClientHeaders(upstream: Response): Headers {
   }
   // Les cookies d'auth posés par Nest doivent arriver au navigateur
   for (const cookie of upstream.headers.getSetCookie()) headers.append("set-cookie", cookie);
+  // Données authentifiées : jamais mises en cache par le navigateur ni par le service worker,
+  // sauf si l'API autorise explicitement le contraire
+  headers.set("cache-control", upstream.headers.get("cache-control") ?? "no-store");
   return headers;
 }
 
@@ -52,9 +55,12 @@ function serviceUnavailable(): Response {
   const body: ApiErrorBody = {
     statusCode: 503,
     code: ErrorCode.SERVICE_UNAVAILABLE,
-    message: MESSAGES.errors.network,
+    message: MESSAGES.errors.unavailable,
   };
-  return Response.json(body, { status: body.statusCode });
+  return Response.json(body, {
+    status: body.statusCode,
+    headers: { "cache-control": "no-store" },
+  });
 }
 
 async function forward(req: Request, ctx: RouteContext<"/api/[...path]">): Promise<Response> {
