@@ -247,4 +247,25 @@ describe("Évolutions et workflow (e2e)", () => {
       expect(list.body[0].author.id).toBe(team.po.user.id);
     });
   });
+
+  describe("Ma boîte", () => {
+    it("propose au PO les gates qu'il peut valider, et rien à l'auteur", async () => {
+      const change = await createChange("À valider par le PO");
+      await transition(team.dev, change, "submit_for_review");
+
+      const poInbox = await team.po.client.get("/inbox");
+      expect(poInbox.status).toBe(200);
+      expect(poInbox.body.toValidate.map((c: { key: string }) => c.key)).toContain(change.key);
+
+      const devInbox = await team.dev.client.get("/inbox");
+      expect(devInbox.body.toValidate.map((c: { key: string }) => c.key)).not.toContain(change.key);
+    });
+
+    it("liste les évolutions assignées", async () => {
+      const change = await createChange("Assignée au testeur");
+      await team.dev.client.patch(`/changes/${change.key}`, { assigneeId: team.tester.user.id });
+      const inbox = await team.tester.client.get("/inbox");
+      expect(inbox.body.assigned.map((c: { key: string }) => c.key)).toContain(change.key);
+    });
+  });
 });

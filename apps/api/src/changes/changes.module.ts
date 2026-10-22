@@ -5,6 +5,8 @@ import { ChangeHistoryService } from "./change-history.service";
 import { ChangeWorkflowService } from "./change-workflow.service";
 import { ChangesController } from "./changes.controller";
 import { ChangesService } from "./changes.service";
+import { InboxController } from "./inbox.controller";
+import { InboxService } from "./inbox.service";
 
 /**
  * Évolutions (« Changes »). `ChangesService` et `ChangeWorkflowService` sont exportés :
@@ -12,8 +14,14 @@ import { ChangesService } from "./changes.service";
  */
 @Module({
   imports: [SpacesModule],
-  controllers: [ChangesController],
-  providers: [ChangesService, ChangeWorkflowService, ChangeHistoryService, ChangeAccessService],
+  controllers: [ChangesController, InboxController],
+  providers: [
+    ChangesService,
+    ChangeWorkflowService,
+    ChangeHistoryService,
+    ChangeAccessService,
+    InboxService,
+  ],
   exports: [ChangesService, ChangeWorkflowService],
 })
 export class ChangesModule {}
