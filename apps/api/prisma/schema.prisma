@@ -14,3 +14,61 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// ─── Authentification (CLAUDE.md §12, D-079) ─────────────────────────────────
+
+/// Compte utilisateur (humain). Les agents IA agiront par délégation (phase MCP).
+model User {
+  id               String    @id @default(uuid(7))
+  /// Toujours stocké normalisé (minuscules, sans espaces)
+  email            String    @unique
+  name             String
+  /// Hash argon2id : le mot de passe n'est jamais stocké ni renvoyé
+  passwordHash     String
+  /// Échecs de connexion consécutifs, remis à zéro après une connexion réussie
+  failedLoginCount Int       @default(0)
+  /// Verrouillage temporaire après trop d'échecs consécutifs
+  lockedUntil      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  sessions Session[]
+}
+
+/// Session = un appareil connecté. Elle regroupe la « famille » de refresh tokens issus
+/// de la même connexion : réutiliser un token déjà consommé révoque toute la session.
+model Session {
+  id         String    @id @default(uuid(7))
+  userId     String
+  userAgent  String?
+  ip         String?
+  lastUsedAt DateTime  @default(now())
+  /// Fin de vie absolue de la session (pas de prolongation au-delà)
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+
+  @@index([userId])
+}
+
+/// Refresh token opaque, stocké haché (SHA-256). Usage unique : chaque refresh le consomme
+/// et en émet un nouveau (rotation).
+model RefreshToken {
+  id        String    @id @default(uuid(7))
+  sessionId String
+  tokenHash String    @unique
+  /// Date de consommation ; une seconde présentation après le délai de grâce = vol présumé
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+}

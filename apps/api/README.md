@@ -51,4 +51,5 @@ Validées au démarrage par Zod (`src/config/env.schema.ts`) : l'API refuse de d
 - **Erreurs** : toute réponse d'erreur suit `{ statusCode, message, code, fieldErrors? }` (type `ApiErrorBody` de `@regie/shared`), messages en français. Lever une `AppException` pour une erreur métier ; les exceptions Nest et Prisma sont traduites automatiquement.
 - **Validation** : DTO créés avec `createZodDto(schema)` à partir des schémas de `@regie/shared` ; le `ZodValidationPipe` global les applique.
 - **Sécurité** : helmet, CORS limité à `WEB_ORIGIN`, rate limiting global (300 requêtes/min/IP, `@SkipThrottle()` pour exclure une route).
+- **Auth** : toute route exige une session, sauf `@Public()`. `@CurrentAuth()` donne l'utilisateur et la session. Les jetons ne transitent que par cookies httpOnly.
 - Le client Prisma est généré dans `src/generated/prisma` (non versionné).

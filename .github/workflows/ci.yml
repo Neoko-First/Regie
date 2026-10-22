@@ -13,9 +13,30 @@ jobs:
   verify:
     name: Lint, typecheck, tests, build
     runs-on: ubuntu-latest
+
+    # Base éphémère pour les tests e2e de l'API
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # Valeurs de CI uniquement (base jetable, aucun secret réel)
     env:
-      # prisma.config.ts exige DATABASE_URL, même pour `prisma generate` (aucune connexion faite)
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+      WEB_ORIGIN: http://localhost:3000
+      JWT_ACCESS_SECRET: ci-only-secret-not-used-anywhere-else-0123456789
+      NODE_ENV: test
+
     steps:
       - uses: actions/checkout@v4
 
@@ -32,3 +53,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+      - name: Migrations et tests e2e de l'API
+        run: |
+          pnpm --filter @regie/api db:deploy
+          pnpm --filter @regie/api test:e2e

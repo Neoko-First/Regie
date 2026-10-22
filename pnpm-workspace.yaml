@@ -10,6 +10,7 @@ onlyBuiltDependencies:
   - prisma
   - "@prisma/engines"
   - "@parcel/watcher"
+  - argon2
 
 # Scripts volontairement bloqués (télémétrie)
 ignoredBuiltDependencies:
