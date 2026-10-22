@@ -45,6 +45,15 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Identifiants** : `SOC-12` = clé d'espace + numéro attribué atomiquement (`Space.changeCounter`).
 - **Administrateur de la plateforme** (`User.isPlatformAdmin`) : crée les espaces, a le rôle ADMIN partout, mais aucun rôle métier (il ne valide pas de gate à ce titre).
 
+## Serveur MCP (phase 6)
+
+- **URL** : `http://localhost:3000/api/mcp` (à travers le proxy BFF), transport HTTP « streamable » sans état, réponses JSON.
+- **Authentification** : jeton d'agent personnel (`Authorization: Bearer regie_pat_…`), créé par un humain dans « Jetons d'agent » ; stocké haché, révocable. L'agent agit avec les droits de cet humain (`AuthContext.isAgent = true`, `agentName` tracé dans l'historique).
+- **Connexion de Claude Code** : `claude mcp add --transport http regie http://localhost:3000/api/mcp --header "Authorization: Bearer <jeton>"` (commande prête à copier à la création du jeton).
+- **Outils** (`apps/api/src/mcp/mcp-server.factory.ts`) : `list_spaces`, `list_changes`, `get_change_context`, `propose_change`, `update_change`, `comment_change`, `move_change`, `request_review`. Ils appellent les MÊMES services que l'UI : ajouter un outil = réutiliser un service, jamais dupliquer une règle.
+- **Un agent ne valide jamais un gate** : refus dans `checkTransition` (`isAgent`), testé en e2e.
+- Les jetons d'agent n'ouvrent PAS l'API REST (sessions navigateur uniquement) : seulement `/mcp`.
+
 ## Versions figées volontairement
 
 | Outil       | Version | Raison                                          |

@@ -6,9 +6,9 @@
 |---|---|
 | **Projet** | Régie — plateforme interne Xotis de gestion des specs, changes et recettes |
 | **Porteur** | Alexandre |
-| **Statut du projet** | Développement du POC |
+| **Statut du projet** | POC fonctionnel (boucle Change) |
 | **Dernière mise à jour** | 2026-10-22 |
-| **Version du document** | 0.19 |
+| **Version du document** | 0.20 |
 
 ---
 
@@ -190,6 +190,8 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-083 | **Workflow codé dans `@regie/shared`** : 11 transitions, rôles par transition (Gate 1 = PO, Gate 2 = Lead tech, Gate 3 = Recetteur), renvois arrière depuis la revue, la conception et la recette. Les **niveaux de cérémonie (D-023) ne sont pas encore appliqués** : toutes les natures suivent le cycle complet | 🟡 Proposée | §6 |
 | D-084 | Garde-fou **Q-022 appliqué strictement** : l'auteur d'une évolution ne valide jamais ses gates, même s'il détient le rôle. Si personne d'autre n'a le rôle, il faut l'attribuer à quelqu'un | 🟡 Proposée | §7 |
 | D-085 | **Administrateur de la plateforme** : crée les espaces et a le rôle Admin dans tous, sans rôle métier (pas de gate) ; un membre non habilité ne voit pas l'espace (404) | 🟡 Proposée | §7 |
+| D-086 | **Authentification MCP du POC par jetons d'agent personnels** (Bearer, hachés, révocables, avec expiration), en attendant le serveur OAuth 2.1 de D-028. L'agent agit par délégation (D-014) et l'historique affiche « Helix, pour le compte d'Alexandre » | 🟡 Proposée | §7, §9 |
+| D-087 | **MCP exposé via le proxy du front** (`/api/mcp`), transport HTTP sans état ; les jetons d'agent n'ouvrent que `/mcp`, pas l'API REST. Resources et prompts MCP (D-021) restent à faire | 🟡 Proposée | §9 |
 
 ---
 
@@ -678,3 +680,4 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-22 | 0.17 | Noyau d'auth livré (D-079) : jetons, sessions, verrouillage, CSRF. Ajout de D-082 (pas d'inscription publique). |
 | 2026-10-22 | 0.18 | Domaine livré côté API (phase 4) : espaces, membres, évolutions, workflow, gates, révisions, commentaires, historique. Ajout de D-083 à D-085. |
 | 2026-10-22 | 0.19 | UI de la boucle Change (phase 5) : Ma boîte (gates à valider, assignations), board et liste filtrables, page évolution (Proposal · Plan · Tasks · Discussion · Historique), actions de gate. Q-023 : point d'entrée « Ma boîte », projet = filtre. |
+| 2026-10-22 | 0.20 | Serveur MCP livré (phase 6) : critère du POC (D-059) atteint, un agent crée une évolution via MCP et un humain la valide dans l'UI. Ajout de D-086 et D-087. |
