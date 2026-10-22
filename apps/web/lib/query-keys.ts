@@ -32,4 +32,7 @@ export const queryKeys = {
   inbox: {
     all: ["inbox"] as const,
   },
+  agentTokens: {
+    all: ["agent-tokens"] as const,
+  },
 } as const;

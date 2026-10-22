@@ -108,6 +108,19 @@ export function CommentsPanel({
   );
 }
 
+/** Initiales qui imposent l'élision « d' » (voyelles et h muet le plus courant). */
+const ELISION_PATTERN = /^[aeiouyhàâäéèêëîïôöùûü]/i;
+
+/**
+ * Préposition « de » avec élision devant une voyelle : « d’Alexandre », « de Paula ».
+ *
+ * @param name - Nom qui suit
+ * @returns « d’ » ou « de  »
+ */
+function frenchOf(name: string): string {
+  return ELISION_PATTERN.test(name) ? "d’" : "de ";
+}
+
 /** Phrase décrivant un événement de l'historique. */
 function describeActivity(activity: ActivityItem): string {
   const data = activity.data;
@@ -173,7 +186,17 @@ export function HistoryPanel({ changeKey }: { changeKey: string }) {
                 <UserAvatar user={item.actor} className="size-5" />
               )}
               <span>
-                <strong className="font-medium">{item.actor.name}</strong> {describeActivity(item)}
+                {/* Délégation (D-014) : « Helix, pour le compte d'Alexandre » */}
+                {typeof item.data.agent === "string" ? (
+                  <>
+                    <strong className="font-medium">{item.data.agent}</strong>, pour le compte{" "}
+                    {frenchOf(item.actor.name)}
+                    <strong className="font-medium">{item.actor.name}</strong>,{" "}
+                  </>
+                ) : (
+                  <strong className="font-medium">{item.actor.name}</strong>
+                )}{" "}
+                {describeActivity(item)}
                 <span className="text-muted-foreground">
                   {" · "}
                   <When date={item.createdAt} />

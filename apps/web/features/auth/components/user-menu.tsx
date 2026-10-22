@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, LogOut, MonitorSmartphone, ShieldOff } from "lucide-react";
+import { Bot, ChevronsUpDown, LogOut, MonitorSmartphone, ShieldOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -51,6 +51,11 @@ export function UserMenu() {
           <DropdownMenuItem asChild>
             <Link href="/settings/sessions">
               <MonitorSmartphone /> Appareils connectés
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/settings/agent-tokens">
+              <Bot /> Jetons d’agent
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
