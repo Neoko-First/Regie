@@ -1,0 +1,32 @@
+# Services de développement local : PostgreSQL + Mailpit (capture des emails).
+# Lancer avec `pnpm db:up`, arrêter avec `pnpm db:down`.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: regie-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-regie}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-regie}
+      POSTGRES_DB: ${POSTGRES_DB:-regie}
+    # Port hôte 5433 : évite le conflit avec un PostgreSQL déjà installé sur le poste (5432)
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - regie-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-regie} -d ${POSTGRES_DB:-regie}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: regie-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Interface web : http://localhost:8025
+
+volumes:
+  regie-postgres-data:
