@@ -22,6 +22,6 @@ import { InboxService } from "./inbox.service";
     ChangeAccessService,
     InboxService,
   ],
-  exports: [ChangesService, ChangeWorkflowService],
+  exports: [ChangesService, ChangeWorkflowService, ChangeHistoryService],
 })
 export class ChangesModule {}

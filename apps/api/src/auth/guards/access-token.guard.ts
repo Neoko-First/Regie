@@ -33,11 +33,11 @@ export class AccessTokenGuard implements CanActivate {
     const payload = await this.tokens.verifyAccessToken(token);
     if (!payload) throw sessionExpired();
 
-    // Session navigateur d'un humain (les jetons d'agent arriveront avec le MCP)
-    const auth = { userId: payload.sub, sessionId: payload.sid, isAgent: false };
-    if (!(await this.auth.isSessionActive(auth))) throw sessionExpired();
+    // Session navigateur d'un humain (les agents passent par AgentTokenGuard, route /mcp)
+    const auth = { userId: payload.sub, sessionId: payload.sid, isAgent: false, agentName: null };
+    if (!(await this.auth.isSessionActive(payload.sub, payload.sid))) throw sessionExpired();
 
-    request.auth = auth;
+    request.authContext = auth;
     return true;
   }
 }

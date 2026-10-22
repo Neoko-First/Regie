@@ -8,6 +8,7 @@ import {
   type UpdateChangeInput,
 } from "@regie/shared";
 import type { AuthContext } from "../auth/auth.types";
+import { delegationData } from "../common/delegation";
 import { conflict, forbidden, invalidField } from "../common/errors/domain-errors";
 import type { Prisma } from "../generated/prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
@@ -110,7 +111,12 @@ export class ChangesService {
         include: CHANGE_SUMMARY_INCLUDE,
       });
       await tx.activity.create({
-        data: { changeId: created.id, actorId: auth.userId, type: "CREATED", data: {} },
+        data: {
+          changeId: created.id,
+          actorId: auth.userId,
+          type: "CREATED",
+          data: delegationData(auth),
+        },
       });
       return created;
     });
@@ -153,7 +159,7 @@ export class ChangesService {
           changeId: change.id,
           actorId: auth.userId,
           type: "UPDATED",
-          data: { fields: Object.keys(input) },
+          data: { fields: Object.keys(input), ...delegationData(auth) },
         },
       });
       return result;

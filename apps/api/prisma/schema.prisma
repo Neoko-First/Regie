@@ -42,6 +42,28 @@ model User {
   gateApprovals   GateApproval[]
   comments        Comment[]
   activities      Activity[]
+  agentTokens     AgentToken[]
+}
+
+/// Jeton d'agent IA (D-014) : un agent agit PAR DÉLÉGATION d'un humain, avec ses droits,
+/// mais ne peut jamais valider un gate (D-009). Stocké haché ; affiché une seule fois.
+model AgentToken {
+  id         String    @id @default(uuid(7))
+  userId     String
+  /// Nom de l'agent, affiché dans l'historique (« Helix, pour le compte d'Alexandre »)
+  name       String
+  tokenHash  String    @unique
+  /// Début du jeton en clair, pour le reconnaître dans la liste sans l'exposer
+  prefix     String
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 /// Session = un appareil connecté. Elle regroupe la « famille » de refresh tokens issus

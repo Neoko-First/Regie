@@ -1,12 +1,16 @@
 /** Contexte d'authentification attaché à la requête par `AccessTokenGuard`. */
 export interface AuthContext {
+  /** Utilisateur humain (pour un agent : la personne qui a délégué ses droits) */
   userId: string;
-  sessionId: string;
+  /** Session navigateur ; `null` pour un agent (authentifié par jeton) */
+  sessionId: string | null;
   /**
    * Vrai quand la requête vient d'un agent IA agissant par délégation (MCP, phase 6).
    * Un agent ne peut jamais valider un gate (D-009).
    */
   isAgent: boolean;
+  /** Nom de l'agent (jeton de délégation), tracé dans l'historique ; `null` pour un humain */
+  agentName: string | null;
 }
 
 /** Contenu (claims) de l'access token JWT. */
@@ -33,6 +37,6 @@ export interface IssuedTokens {
 declare module "express" {
   interface Request {
     /** Renseigné par `AccessTokenGuard` sur les routes protégées */
-    auth?: AuthContext;
+    authContext?: AuthContext;
   }
 }

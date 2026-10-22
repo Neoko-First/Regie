@@ -116,7 +116,7 @@ export class AuthService {
   async refresh(rawToken: string, client: ClientContext): Promise<IssuedTokens> {
     const now = new Date();
     const stored = await this.prisma.refreshToken.findUnique({
-      where: { tokenHash: this.tokens.hashRefreshToken(rawToken) },
+      where: { tokenHash: this.tokens.hashOpaqueToken(rawToken) },
       include: { session: { include: { user: true } } },
     });
     if (!stored) throw sessionExpired();
@@ -150,14 +150,15 @@ export class AuthService {
    * Vérifie qu'une session est toujours active (appelé à chaque requête authentifiée) :
    * une session révoquée est refusée immédiatement, sans attendre l'expiration du JWT.
    *
-   * @param auth - Utilisateur et session issus de l'access token
+   * @param userId - Utilisateur issu de l'access token
+   * @param sessionId - Session issue de l'access token
    * @returns `true` si la session est active et l'utilisateur non supprimé
    */
-  async isSessionActive(auth: AuthContext): Promise<boolean> {
+  async isSessionActive(userId: string, sessionId: string): Promise<boolean> {
     const count = await this.prisma.session.count({
       where: {
-        id: auth.sessionId,
-        userId: auth.userId,
+        id: sessionId,
+        userId,
         revokedAt: null,
         expiresAt: { gt: new Date() },
         user: { deletedAt: null },
@@ -174,7 +175,7 @@ export class AuthService {
    */
   async logoutByRefreshToken(rawToken: string): Promise<void> {
     const stored = await this.prisma.refreshToken.findUnique({
-      where: { tokenHash: this.tokens.hashRefreshToken(rawToken) },
+      where: { tokenHash: this.tokens.hashOpaqueToken(rawToken) },
       select: { sessionId: true },
     });
     if (stored) await this.revokeSessions({ id: stored.sessionId });
@@ -288,7 +289,7 @@ export class AuthService {
     sessionExpiresAt: Date,
     now: Date,
   ): Promise<IssuedTokens> {
-    const refresh = this.tokens.generateRefreshToken();
+    const refresh = this.tokens.generateOpaqueToken();
     const slidingExpiry = addMs(now, REFRESH_TOKEN_TTL_MS);
     const refreshTokenExpiresAt =
       slidingExpiry < sessionExpiresAt ? slidingExpiry : sessionExpiresAt;

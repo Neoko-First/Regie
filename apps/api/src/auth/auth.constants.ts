@@ -29,8 +29,8 @@ export const MAX_FAILED_LOGINS = 5;
 /** Durée du verrouillage temporaire. */
 export const LOGIN_LOCK_DURATION_MS = 15 * MINUTE_MS;
 
-/** Nombre d'octets aléatoires d'un refresh token (256 bits). */
-export const REFRESH_TOKEN_BYTES = 32;
+/** Nombre d'octets aléatoires d'un jeton opaque : refresh token, jeton d'agent (256 bits). */
+export const OPAQUE_TOKEN_BYTES = 32;
 
 /** Rate limiting renforcé des routes d'auth (par IP). */
 export const AUTH_THROTTLE = {
