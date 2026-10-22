@@ -8,7 +8,7 @@
 | **Porteur** | Alexandre |
 | **Statut du projet** | Développement du POC |
 | **Dernière mise à jour** | 2026-10-22 |
-| **Version du document** | 0.16 |
+| **Version du document** | 0.17 |
 
 ---
 
@@ -186,6 +186,7 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-079 | **Auth du POC** : auth maison (access token court + refresh token avec rotation, argon2id, politique de mot de passe partagée, sessions). Vérification d'email, reset et MFA viennent ensuite. Remplacement par un serveur OAuth 2.1 (D-028) à reconsidérer pour la V0 | ✅ Actée | §7 |
 | D-080 | **Libellé UI « Évolution »** (le modèle de code garde le nom `Change`) et **identifiants par espace** (`SOC-12`), appliquant D-071 | ✅ Actée | §5 ter, §11 |
 | D-081 | Le **serveur MCP est un module de l'API Nest** (transport HTTP streamable sur `/mcp`), qui réutilise services, guards et machine à états | ✅ Actée | §9 |
+| D-082 | **Pas d'inscription publique** dans le noyau d'auth : comptes créés par le seed en développement, puis par un admin (invitation) ; session = un appareil, révocable | 🟡 Proposée | §7 |
 
 ---
 
@@ -671,3 +672,4 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-21 | 0.14 | Organisation par espaces et modules : §5 ter, D-069 à D-072. Q-031 résolue, Q-032. |
 | 2026-10-21 | 0.15 | Proposition d'organisation d'ensemble : §5 quater, D-073 à D-077. |
 | 2026-10-22 | 0.16 | Démarrage du développement du POC : D-078 (stack), D-079 (auth du POC), D-080 (libellé « Évolution » + ID par espace), D-081 (MCP dans l'API Nest). Q-007 résolue. |
+| 2026-10-22 | 0.17 | Noyau d'auth livré (D-079) : jetons, sessions, verrouillage, CSRF. Ajout de D-082 (pas d'inscription publique). |

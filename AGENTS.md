@@ -25,6 +25,14 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Valeurs connues seulement côté client** (thème stocké…) : utiliser `useIsClient()` pour éviter les erreurs d'hydratation.
 - **Composants `components/ui/`** : générés par shadcn, modifiés uniquement pour la traduction française des libellés, la variante `success` du `Button` et la conformité au lint. Après un `shadcn add`, retraduire les libellés anglais.
 
+## Authentification (phase 3)
+
+- **Jetons** : access token JWT (15 min, cookie `regie_at`) + refresh token opaque haché en base (cookie `regie_rt`, limité à `/api/auth`), rotation à chaque usage, réutilisation après 10 s de grâce = révocation de la session. Cookie indicateur `regie_session` (sans secret) lu par `apps/web/proxy.ts`.
+- **Toutes les routes de l'API exigent une session** (`AccessTokenGuard` global), sauf `@Public()`. Les requêtes mutantes authentifiées par cookie doivent porter l'`Origin` du front (`OriginGuard`).
+- **Pas d'inscription publique** : les comptes de développement viennent du seed (`pnpm --filter @regie/api db:seed`, mot de passe `SEED_USER_PASSWORD`). La création de comptes par un admin viendra plus tard.
+- **Tests e2e** (`pnpm --filter @regie/api test:e2e`) : base PostgreSQL réelle, app servie sous `/api` comme derrière le BFF. À enrichir pour toute modification de l'auth.
+- **Préchargement serveur** : `lib/server/prefetch.tsx` (`<Prefetch>`) sous un `<Suspense>` ; un Server Component ne peut pas rafraîchir la session, c'est le client qui prend le relais sur 401.
+
 ## Versions figées volontairement
 
 | Outil       | Version | Raison                                          |
@@ -41,12 +49,12 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 
 Objectif : un agent crée une évolution via MCP, elle apparaît au board, un humain la fait passer un gate dans l'UI.
 
-| Phase                                                      | Branche                    | État |
-| ---------------------------------------------------------- | -------------------------- | ---- |
-| 0. Bootstrap monorepo                                      | `chore/bootstrap-monorepo` | ✅   |
-| 1. Coquille web (shadcn, thème, sidebar, briques TanStack) | `feat/web-shell`           | ✅   |
-| 2. Socle API (Nest, Prisma, erreurs, sécurité)             | `feat/api-foundation`      | ✅   |
-| 3. Auth maison, noyau (D-079)                              | `feat/auth`                | ⏳   |
-| 4. Domaine : espaces, évolutions, workflow, gates          | `feat/changes-domain`      | ⏳   |
-| 5. UI métier : board, liste, page évolution                | `feat/board-change-page`   | ⏳   |
-| 6. Serveur MCP (module Nest, D-081)                        | `feat/mcp`                 | ⏳   |
+| Phase                                                      | Branche                    | État                           |
+| ---------------------------------------------------------- | -------------------------- | ------------------------------ |
+| 0. Bootstrap monorepo                                      | `chore/bootstrap-monorepo` | ✅                             |
+| 1. Coquille web (shadcn, thème, sidebar, briques TanStack) | `feat/web-shell`           | ✅                             |
+| 2. Socle API (Nest, Prisma, erreurs, sécurité)             | `feat/api-foundation`      | ✅                             |
+| 3. Auth maison, noyau (D-079)                              | `feat/auth`                | ✅ (relecture humaine requise) |
+| 4. Domaine : espaces, évolutions, workflow, gates          | `feat/changes-domain`      | ⏳                             |
+| 5. UI métier : board, liste, page évolution                | `feat/board-change-page`   | ⏳                             |
+| 6. Serveur MCP (module Nest, D-081)                        | `feat/mcp`                 | ⏳                             |
