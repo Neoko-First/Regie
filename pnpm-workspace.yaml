@@ -1,0 +1,17 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Dépendances autorisées à exécuter des scripts d'installation (binaires natifs)
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - prisma
+  - "@prisma/engines"
+  - "@parcel/watcher"
+  - argon2
+
+# Scripts volontairement bloqués (télémétrie)
+ignoredBuiltDependencies:
+  - "@scarf/scarf"

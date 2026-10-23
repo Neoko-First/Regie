@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+# Variables d'environnement : jamais commitées (cf. .env.example)
+.env
+# Client Prisma généré (prisma generate)
+/src/generated/prisma
+
+# Skills d agents installés par `prisma init` (non utilisés par le projet)
+.agents/
+.claude/
+.windsurf/
+skills-lock.json

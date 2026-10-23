@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+dist/
+.next/
+.turbo/
+coverage/
+docs/
+CLAUDE.md
+apps/api/src/generated/
+**/.agents/
+**/.windsurf/
