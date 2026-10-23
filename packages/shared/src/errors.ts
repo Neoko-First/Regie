@@ -20,6 +20,8 @@ export const ErrorCode = {
   CONFLICT: "CONFLICT",
   /** Trop de requêtes (rate limiting) */
   TOO_MANY_REQUESTS: "TOO_MANY_REQUESTS",
+  /** API injoignable (renvoyé par le proxy BFF, ou détecté par le client en cas de coupure réseau) */
+  SERVICE_UNAVAILABLE: "SERVICE_UNAVAILABLE",
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

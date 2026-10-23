@@ -1,0 +1,16 @@
+// Schéma Prisma de Régie. Toute modification passe par une migration nommée :
+//   pnpm --filter @regie/api db:migrate --name <nom>
+// Règles (CLAUDE.md §14) : createdAt / updatedAt sur toutes les tables,
+// soft delete (deletedAt) pour les données métier importantes.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  // NestJS compile en CommonJS
+  moduleFormat        = "cjs"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+}

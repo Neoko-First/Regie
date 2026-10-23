@@ -13,6 +13,9 @@ jobs:
   verify:
     name: Lint, typecheck, tests, build
     runs-on: ubuntu-latest
+    env:
+      # prisma.config.ts exige DATABASE_URL, même pour `prisma generate` (aucune connexion faite)
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
     steps:
       - uses: actions/checkout@v4
 

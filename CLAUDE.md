@@ -15,7 +15,7 @@
 | Back | NestJS, TypeScript strict |
 | BDD | PostgreSQL + Prisma (côté NestJS **uniquement**) |
 | UI | Tailwind CSS + shadcn/ui (+ `lucide-react` pour les icônes) |
-| Formulaires | React Hook Form + Zod (`@hookform/resolvers/zod`) via le composant `Form` de shadcn |
+| Formulaires | React Hook Form + Zod (`@hookform/resolvers/zod`) via les composants `Field` de shadcn (+ `Controller` de RHF) |
 | Validation partagée | Zod (schémas partagés front/back), `nestjs-zod` côté Nest |
 | State serveur | TanStack Query (cache, optimistic updates, refetch au focus) |
 | State client | Zustand (état **UI** uniquement) |
@@ -297,7 +297,7 @@ export function optimisticHandlers<TData, TVariables>(
 
 ## 9. Formulaires
 
-- Toujours **React Hook Form + Zod** via les composants shadcn `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage`.
+- Toujours **React Hook Form + Zod** via les composants shadcn `Field`, `FieldLabel`, `FieldDescription`, `FieldError` et le `Controller` de React Hook Form. (L'ancien composant `Form` de shadcn n'existe plus dans le registre actuel.) Les champs courants sont factorisés dans `components/ui-extended/form-fields.tsx` (`TextField`, `TextareaField`…).
 - `defaultValues` toujours renseignées (jamais `undefined`, sinon `isDirty` est faussé).
 - **Bouton de validation désactivé** tant que `!formState.isDirty || formState.isSubmitting`.
 - **Bouton Annuler** : appelle `form.reset()` pour revenir aux valeurs initiales. Il **ne ferme pas** la modale. Il est lui aussi désactivé si le formulaire n'est pas modifié.
