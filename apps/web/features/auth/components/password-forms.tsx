@@ -12,13 +12,13 @@ import {
 import { ArrowLeft, KeyRound, Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { type Path, useForm, type UseFormReturn, useWatch } from "react-hook-form";
+import { useForm, type UseFormReturn, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Callout } from "@/components/ui-extended/callout";
 import { FormDialog } from "@/components/ui-extended/form-dialog";
 import { PasswordField, TextField } from "@/components/ui-extended/form-fields";
-import { isApiError } from "@/lib/api-client";
+import { applyFieldErrors } from "@/lib/form-errors";
 import {
   useChangePassword,
   useForgotPassword,
@@ -26,22 +26,6 @@ import {
 } from "../hooks/use-password-flows";
 import { LOGIN_PATH } from "../lib/safe-redirect";
 import { PasswordStrength } from "./password-strength";
-
-/**
- * Remonte les erreurs de champ renvoyées par l'API dans le formulaire (CLAUDE.md §9).
- *
- * @param form - Formulaire concerné
- * @param error - Erreur reçue
- */
-function applyFieldErrors<T extends Record<string, unknown>>(
-  form: UseFormReturn<T>,
-  error: unknown,
-) {
-  if (!isApiError(error) || !error.fieldErrors) return;
-  for (const [field, messages] of Object.entries(error.fieldErrors)) {
-    form.setError(field as Path<T>, { message: messages.join(" ") });
-  }
-}
 
 /** Lien de retour vers la connexion. */
 function BackToLogin() {
