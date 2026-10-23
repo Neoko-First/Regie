@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="docs/brand/regie-wordmark.svg#gh-light-mode-only" alt="Régie" width="260" />
+  <img src="docs/brand/regie-wordmark-dark.svg#gh-dark-mode-only" alt="Régie" width="260" />
+</p>
+
 # Régie
 
 > De la spec à la recette, toute la production au même endroit.

@@ -196,6 +196,7 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-089 | **Workflow Git** : `develop` (intégration, par défaut, squash) et `main` (production, releases taguées en merge commit), protégées par des rulesets GitHub ; `preprod` à ajouter avec l'environnement | ✅ Actée | §12 bis |
 | D-090 | **Emails** : Mailjet, clés API configurables par l'administrateur de la plateforme dans l'interface, chiffrées en base (AES-256-GCM, clé en variable d'environnement), jamais réaffichées ; SMTP de repli (Mailpit) en développement | ✅ Actée | §12 bis |
 | D-091 | **Invitations** : un admin d'espace invite dans son espace, l'administrateur de la plateforme partout ; le compte est créé à l'acceptation du lien (jeton haché, usage unique, 7 jours) | ✅ Actée | §12 bis |
+| D-092 | **Logo** : le « clap validé » (clap de cinéma, D-024, marqué d'une coche), sur fond `--primary` ; version compacte sous 32 px ; kit dans `docs/brand/` | ✅ Actée | §11 |
 
 ---
 
@@ -689,3 +690,4 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-23 | 0.21 | Release v0.1.0 (POC). D-088 : design system d'Alexandre (remplace D-062). D-089 : workflow Git develop / main et protections. |
 | 2026-10-23 | 0.22 | V0 pilotable, étape 1 : emails transactionnels, mot de passe oublié / réinitialisation / changement. D-090 (Mailjet configurable dans l'interface), D-091 (invitations par les admins d'espace). |
 | 2026-10-23 | 0.23 | V0 pilotable, étape 2 : invitations par email, administration des espaces et des membres (D-091 livrée), garde-fou du dernier admin. D-082 actée. |
+| 2026-10-23 | 0.24 | D-092 : logo « clap validé » (icône, favicon clair / sombre, icônes PWA et iOS, wordmark). |
