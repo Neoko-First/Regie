@@ -41,6 +41,7 @@ export const AUTH_THROTTLE = {
   refresh: { default: { limit: 60, ttl: MINUTE_MS } },
   forgotPassword: { default: { limit: 5, ttl: MINUTE_MS } },
   resetPassword: { default: { limit: 10, ttl: MINUTE_MS } },
+  invitation: { default: { limit: 10, ttl: MINUTE_MS } },
 } as const;
 
 /** Message unique en cas d'échec de connexion : ne révèle pas si le compte existe. */

@@ -116,6 +116,12 @@ export function createClient(app: NestExpressApplication) {
         .set("Origin", origin)
         .set("X-Forwarded-For", ip)
         .send(body),
+    put: (url: string, body?: object) =>
+      agent
+        .put(prefix + url)
+        .set("Origin", origin)
+        .set("X-Forwarded-For", ip)
+        .send(body),
     delete: (url: string) =>
       agent
         .delete(prefix + url)

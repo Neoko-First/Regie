@@ -1,14 +1,12 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { renderPasswordChangedEmail, renderPasswordResetEmail } from "@regie/emails";
 import {
   type ChangePasswordInput,
-  ErrorCode,
   isPasswordDifferentFromEmail,
   PASSWORD_EQUALS_EMAIL_MESSAGE,
   type ResetPasswordInput,
 } from "@regie/shared";
-import { AppException } from "../common/errors/app.exception";
-import { invalidField } from "../common/errors/domain-errors";
+import { badRequest, invalidField } from "../common/errors/domain-errors";
 import { formatDateTimeFr } from "../common/format";
 import { AppConfigService } from "../config/app-config.service";
 import { MailService } from "../mail/mail.service";
@@ -100,11 +98,7 @@ export class PasswordFlowsService {
       stored.expiresAt <= now ||
       stored.user.deletedAt
     ) {
-      throw new AppException(
-        HttpStatus.BAD_REQUEST,
-        ErrorCode.VALIDATION_FAILED,
-        INVALID_RESET_LINK,
-      );
+      throw badRequest(INVALID_RESET_LINK);
     }
     if (!isPasswordDifferentFromEmail(input.password, stored.user.email)) {
       throw invalidField("password", PASSWORD_EQUALS_EMAIL_MESSAGE);
@@ -117,11 +111,7 @@ export class PasswordFlowsService {
       data: { usedAt: now },
     });
     if (consumed.count === 0) {
-      throw new AppException(
-        HttpStatus.BAD_REQUEST,
-        ErrorCode.VALIDATION_FAILED,
-        INVALID_RESET_LINK,
-      );
+      throw badRequest(INVALID_RESET_LINK);
     }
     await this.prisma.user.update({
       where: { id: stored.user.id },

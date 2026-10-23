@@ -44,6 +44,7 @@ model User {
   activities         Activity[]
   agentTokens        AgentToken[]
   verificationTokens VerificationToken[]
+  sentInvitations    Invitation[]
 }
 
 /// Usages des jetons envoyés par email.
@@ -209,6 +210,7 @@ model Space {
 
   memberships Membership[]
   changes     Change[]
+  invitations Invitation[]
 }
 
 /// Appartenance d'un utilisateur à un espace, avec des rôles cumulables (D-063).
@@ -325,4 +327,28 @@ model Activity {
   actor  User   @relation(fields: [actorId], references: [id])
 
   @@index([changeId, createdAt])
+}
+
+/// Invitation à rejoindre un espace (D-091). Le compte est créé à l'acceptation du lien.
+/// Une seule invitation en attente par adresse et par espace : la renvoyer remplace son jeton.
+model Invitation {
+  id          String      @id @default(uuid(7))
+  spaceId     String
+  /// Toujours stocké normalisé (minuscules, sans espaces)
+  email       String
+  roles       SpaceRole[]
+  /// Hash SHA-256 du jeton du lien : le jeton lui-même n'est jamais stocké
+  tokenHash   String      @unique
+  invitedById String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  space     Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  invitedBy User  @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([spaceId, email])
+  @@index([email])
 }

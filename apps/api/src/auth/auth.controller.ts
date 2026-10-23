@@ -18,22 +18,12 @@ import type { Request, Response } from "express";
 import { AUTH_THROTTLE } from "./auth.constants";
 import { AuthCookiesService } from "./auth-cookies.service";
 import { AuthService, sessionExpired } from "./auth.service";
-import type { AuthContext, ClientContext } from "./auth.types";
+import type { AuthContext } from "./auth.types";
+import { clientContext } from "./client-context";
 import { CurrentAuth } from "./decorators/current-auth.decorator";
 import { Public } from "./decorators/public.decorator";
 import { ChangePasswordDto, ForgotPasswordDto, LoginDto, ResetPasswordDto } from "./dto/login.dto";
 import { PasswordFlowsService } from "./password-flows.service";
-
-/** Longueur maximale conservée du user agent (évite de stocker des en-têtes démesurés). */
-const USER_AGENT_MAX_LENGTH = 512;
-
-/** Extrait l'appareil et l'IP de la requête (IP réelle transmise par le proxy BFF). */
-function clientContext(req: Request): ClientContext {
-  return {
-    userAgent: req.headers["user-agent"]?.slice(0, USER_AGENT_MAX_LENGTH) ?? null,
-    ip: req.ip ?? null,
-  };
-}
 
 /** Lit le refresh token dans son cookie. */
 function readRefreshToken(req: Request): string | undefined {
