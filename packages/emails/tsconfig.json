@@ -1,0 +1,8 @@
+{
+  "extends": "@regie/config/tsconfig/library.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["src", "tsup.config.ts", "vitest.config.ts"]
+}

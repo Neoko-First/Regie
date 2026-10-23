@@ -6,6 +6,10 @@ export default {
   rules: {
     "subject-case": [0],
     // Avertissement seulement : un commit transverse peut se passer de scope
-    "scope-enum": [1, "always", ["web", "api", "shared", "config", "ci", "deps", "docs", "repo"]],
+    "scope-enum": [
+      1,
+      "always",
+      ["web", "api", "shared", "emails", "config", "ci", "deps", "docs", "repo"],
+    ],
   },
 };
