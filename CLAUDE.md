@@ -432,6 +432,12 @@ On reproduit le **modèle de jetons standard d'OAuth2** (access token court + re
 
 ---
 
+## 16 bis. Git
+
+- `develop` est la branche d'intégration (par défaut) ; `main` est la production. Toute PR de travail cible **`develop`** (et non `main`) ; `main` ne reçoit que des PR de release depuis `develop`.
+- Merge en **squash** vers `develop` (le titre de PR, en Conventional Commits avec scope, devient le commit) ; **merge commit** + tag pour les releases vers `main`.
+- Détail des protections et des procédures : `AGENTS.md`, section « Workflow Git ».
+
 ## 17. Definition of Done (à vérifier avant de dire qu'une tâche est finie)
 
 - [ ] La page est un Server Component avec ses metadata, et précharge ses données dans le cache TanStack.
