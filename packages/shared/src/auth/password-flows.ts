@@ -5,7 +5,7 @@ import { passwordSchema } from "./password";
 // Parcours « mot de passe oublié », réinitialisation et changement (CLAUDE.md §12.3).
 
 /** Message quand la confirmation ne correspond pas au mot de passe saisi. */
-const PASSWORD_MISMATCH = "Les deux mots de passe ne correspondent pas.";
+export const PASSWORD_MISMATCH_MESSAGE = "Les deux mots de passe ne correspondent pas.";
 
 export const forgotPasswordSchema = z.object({ email: emailSchema });
 
@@ -19,7 +19,7 @@ export const resetPasswordSchema = z
     passwordConfirm: z.string(),
   })
   .refine((input) => input.password === input.passwordConfirm, {
-    error: PASSWORD_MISMATCH,
+    error: PASSWORD_MISMATCH_MESSAGE,
     path: ["passwordConfirm"],
   });
 
@@ -33,7 +33,7 @@ export const changePasswordSchema = z
     newPasswordConfirm: z.string(),
   })
   .refine((input) => input.newPassword === input.newPasswordConfirm, {
-    error: PASSWORD_MISMATCH,
+    error: PASSWORD_MISMATCH_MESSAGE,
     path: ["newPasswordConfirm"],
   })
   .refine((input) => input.newPassword !== input.currentPassword, {

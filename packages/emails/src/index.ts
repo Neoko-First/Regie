@@ -1,5 +1,7 @@
 import { render, toPlainText } from "@react-email/render";
 import { createElement, type ReactElement } from "react";
+import { InvitationEmail, type InvitationEmailProps } from "./templates/invitation";
+import { MemberAddedEmail, type MemberAddedEmailProps } from "./templates/member-added";
 import { PasswordChangedEmail, type PasswordChangedEmailProps } from "./templates/password-changed";
 import { PasswordResetEmail, type PasswordResetEmailProps } from "./templates/password-reset";
 import { TestEmail, type TestEmailProps } from "./templates/test-email";
@@ -60,4 +62,36 @@ export function renderTestEmail(props: TestEmailProps): Promise<RenderedEmail> {
   return renderEmail("Test d'envoi d'email depuis Régie", createElement(TestEmail, props));
 }
 
-export type { PasswordChangedEmailProps, PasswordResetEmailProps, TestEmailProps };
+/**
+ * Invitation à rejoindre un espace (personne sans compte).
+ *
+ * @param props - Auteur de l'invitation, espace, lien et durée de validité
+ * @returns L'email rendu
+ */
+export function renderInvitationEmail(props: InvitationEmailProps): Promise<RenderedEmail> {
+  return renderEmail(
+    `${props.inviterName} vous invite sur Régie (espace ${props.spaceName})`,
+    createElement(InvitationEmail, props),
+  );
+}
+
+/**
+ * Notification d'ajout à un espace (utilisateur qui a déjà un compte).
+ *
+ * @param props - Destinataire, auteur de l'ajout, espace et lien vers Régie
+ * @returns L'email rendu
+ */
+export function renderMemberAddedEmail(props: MemberAddedEmailProps): Promise<RenderedEmail> {
+  return renderEmail(
+    `Vous avez rejoint l'espace ${props.spaceName} sur Régie`,
+    createElement(MemberAddedEmail, props),
+  );
+}
+
+export type {
+  InvitationEmailProps,
+  MemberAddedEmailProps,
+  PasswordChangedEmailProps,
+  PasswordResetEmailProps,
+  TestEmailProps,
+};
