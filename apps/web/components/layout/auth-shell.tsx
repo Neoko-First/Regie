@@ -1,6 +1,5 @@
-import { APP_NAME } from "@regie/shared";
-import { Clapperboard } from "lucide-react";
 import type { ReactNode } from "react";
+import { RegieWordmark } from "@/components/brand/regie-logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 /** Propriétés de la mise en page des pages publiques. */
@@ -18,12 +17,7 @@ export function AuthShell({ title, description, children }: AuthShellProps) {
   return (
     <main className="bg-background flex min-h-svh items-center justify-center p-6">
       <div className="flex w-full max-w-md flex-col gap-6">
-        <div className="flex items-center justify-center gap-2">
-          <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
-            <Clapperboard className="size-4" />
-          </span>
-          <span className="text-h4 font-extrabold">{APP_NAME}</span>
-        </div>
+        <RegieWordmark size={44} className="self-center" />
         <Card>
           <CardHeader>
             <CardTitle className="text-h4">{title}</CardTitle>

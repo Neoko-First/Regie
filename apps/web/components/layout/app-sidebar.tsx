@@ -1,10 +1,11 @@
 "use client";
 
 import { APP_NAME } from "@regie/shared";
-import { Clapperboard, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
+import { RegieMark } from "@/components/brand/regie-logo";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import {
   Sidebar,
@@ -72,10 +73,9 @@ export function AppSidebar({ userMenu }: { userMenu: ReactNode }) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip={APP_NAME}>
               <Link href="/inbox">
-                {/* Identité cinéma (D-024) : le clap, discret */}
-                <span className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Clapperboard className="size-4" />
-                </span>
+                {/* Logo « clap validé » (D-092), version compacte : il reste lisible replié.
+                    size-8! : le bouton impose size-4 à tous ses svg. */}
+                <RegieMark size={32} className="size-8!" />
                 <span className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">{APP_NAME}</span>
                   <span className="text-muted-foreground text-xs">De la spec à la recette</span>
