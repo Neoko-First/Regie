@@ -72,6 +72,7 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Le workflow est défini une seule fois** dans `packages/shared/src/domain/workflow.ts` (`TRANSITIONS`, `checkTransition`). L'API l'applique (`ChangeWorkflowService`), l'UI s'en sert pour afficher les boutons. Ne jamais coder une règle de transition ailleurs.
 - **Règles des gates** : rôle requis (PO / Lead tech / Recetteur), jamais un agent (`AuthContext.isAgent`), jamais l'auteur de l'évolution. Chaque gate fige une `Revision` immuable et une `GateApproval`.
 - **Accès** : toute route d'une évolution passe par `ChangeAccessService.requireAccess` (404 si l'utilisateur n'est pas membre de l'espace) ; les écritures exigent un rôle contributeur (`SpaceAccessService.assertRoles`).
+- **Board glisser-déposer** (`@dnd-kit/core`) : le dépôt d'une carte est traduit en transition par `resolveBoardDrop` (`features/changes/lib/board-drop.ts`), qui s'appuie sur `checkTransition`. Transition simple : optimiste (`useBoardTransition`) ; gate ou renvoi : `TransitionDialog`. Clavier : Espace pour saisir, flèches pour changer de colonne, Espace pour déposer.
 - **Concurrence** : une transition envoie `fromStatus` ; l'API refuse (409) si le statut a changé, et la mise à jour est conditionnée au statut en base.
 - **Identifiants** : `SOC-12` = clé d'espace + numéro attribué atomiquement (`Space.changeCounter`).
 - **Administrateur de la plateforme** (`User.isPlatformAdmin`) : crée les espaces, a le rôle ADMIN partout, mais aucun rôle métier (il ne valide pas de gate à ce titre).

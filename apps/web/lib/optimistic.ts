@@ -43,8 +43,11 @@ export interface OptimisticOptions<TData, TVariables> {
   queryKey: QueryKey;
   /** Applique la modification attendue sur les données en cache */
   updater: (old: TData | undefined, variables: TVariables) => TData;
-  /** Textes des toasts ; sans `error`, le message renvoyé par l'API est affiché */
-  messages: { success: string; error?: string };
+  /**
+   * Textes des toasts ; `success` peut dépendre des variables (ex. « SOC-12 : En recette »).
+   * Sans `error`, le message renvoyé par l'API est affiché.
+   */
+  messages: { success: string | ((variables: TVariables) => string); error?: string };
   /** Clés supplémentaires à resynchroniser après la mutation (ex. listes dépendantes) */
   invalidateKeys?: QueryKey[];
 }
@@ -98,8 +101,10 @@ export function optimisticHandlers<TData, TVariables>({
       notifyError(messages.error ?? getErrorMessage(error));
     },
 
-    onSuccess: () => {
-      toast.success(messages.success);
+    onSuccess: (_data: unknown, variables: TVariables) => {
+      toast.success(
+        typeof messages.success === "function" ? messages.success(variables) : messages.success,
+      );
     },
 
     onSettled: async (

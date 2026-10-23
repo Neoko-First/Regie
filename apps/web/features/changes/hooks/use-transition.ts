@@ -1,9 +1,17 @@
 "use client";
 
-import { CHANGE_STATUS_LABELS, ErrorCode, type TransitionRequest } from "@regie/shared";
+import {
+  CHANGE_STATUS_LABELS,
+  type ChangeFilters,
+  type ChangeSummary,
+  ErrorCode,
+  type Transition,
+  type TransitionRequest,
+} from "@regie/shared";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { isApiError } from "@/lib/api-client";
+import { optimisticHandlers } from "@/lib/optimistic";
 import { queryKeys } from "@/lib/query-keys";
 import { changesApi } from "../api";
 
@@ -38,5 +46,38 @@ export function useTransition(key: string) {
           queryKeys.inbox.all,
         ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
       ),
+  });
+}
+
+/** Déplacement d'une carte du board : l'évolution et la transition qu'implique le dépôt. */
+export interface BoardMove {
+  change: Pick<ChangeSummary, "id" | "key" | "status">;
+  transition: Pick<Transition, "id" | "to">;
+}
+
+/**
+ * Transition simple déclenchée par un glisser-déposer sur le board, OPTIMISTE : la carte
+ * change de colonne tout de suite, et revient à sa place si l'API refuse (rôle, statut
+ * changé entre-temps). Les gates et les renvois ne passent pas par ici : ils sont confirmés
+ * dans une modale (`useTransition`).
+ *
+ * @param filters - Filtres de la liste affichée sur le board
+ * @returns La mutation
+ */
+export function useBoardTransition(filters: ChangeFilters) {
+  return useMutation({
+    mutationFn: ({ change, transition }: BoardMove) =>
+      changesApi.transition(change.key, { transition: transition.id, fromStatus: change.status }),
+    ...optimisticHandlers<ChangeSummary[] | undefined, BoardMove>({
+      queryKey: queryKeys.changes.list(filters),
+      updater: (old, { change, transition }) =>
+        old?.map((item) => (item.id === change.id ? { ...item, status: transition.to } : item)),
+      messages: {
+        success: ({ change, transition }) =>
+          `${change.key} : ${CHANGE_STATUS_LABELS[transition.to]}`,
+      },
+      // Détail, historique et autres listes de l'évolution : rechargés au prochain affichage
+      invalidateKeys: [queryKeys.changes.all, queryKeys.inbox.all],
+    }),
   });
 }
