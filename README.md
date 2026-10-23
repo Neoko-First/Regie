@@ -25,6 +25,8 @@ cp apps/web/.env.example apps/web/.env.local
 pnpm dev        # front sur http://localhost:3000, API sur http://localhost:4000
 ```
 
+Dans `apps/api/.env`, renseigner `SETTINGS_ENCRYPTION_KEY` (`openssl rand -base64 32`). En développement, les emails partent vers Mailpit ; en production, l'administrateur de la plateforme configure Mailjet dans **Administration › Envoi des emails**.
+
 ## Connecter un agent IA (MCP)
 
 1. Dans Régie : menu utilisateur → **Jetons d'agent** → **Nouveau jeton**.
@@ -44,6 +46,7 @@ apps/
   api/        # NestJS + Prisma (API)
 packages/
   shared/     # Schémas Zod, types, constantes, codes d'erreur partagés
+  emails/     # Templates d'emails transactionnels (react-email)
   config/     # Configs TypeScript, ESLint, Prettier
 docs/         # Document de référence et pitch
 ```
