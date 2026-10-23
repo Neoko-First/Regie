@@ -7,8 +7,8 @@
 | **Projet** | Régie — plateforme interne Xotis de gestion des specs, changes et recettes |
 | **Porteur** | Alexandre |
 | **Statut du projet** | POC fonctionnel (boucle Change) |
-| **Dernière mise à jour** | 2026-10-22 |
-| **Version du document** | 0.20 |
+| **Dernière mise à jour** | 2026-10-23 |
+| **Version du document** | 0.21 |
 
 ---
 
@@ -166,7 +166,7 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-059 | Implémentation test (POC) : **boucle Change** (un agent crée un Change via MCP, un humain le valide dans l'UI, statut visible au board). La **recette intégrée** est l'extension prioritaire si le temps le permet | ✅ Actée | §12 bis |
 | D-060 | **~1 jour par semaine** de pilotage humain après le POC, demandé explicitement dans le pitch | ✅ Actée | §12 bis |
 | D-061 | Supports du pitch : **doc de pitch d'une page + maquettes cliquables** | ✅ Actée | §12 bis |
-| D-062 | **Pas de charte Xotis** : Régie adopte une **charte neutre et efficace** (outil interne, priorité à la lisibilité) | ✅ Actée | §11 |
+| D-062 | ~~**Pas de charte Xotis** : Régie adopte une **charte neutre et efficace**~~ | 🔁 Remplacée par D-088 | §11 |
 | D-064 | Les **specs de xotis-recette** (spec 007, ADR-0008 à 0010) servent de **base au module de recette de Régie** ; elles remplacent les propositions D-022 et D-031 à D-036 | ✅ Actée | §10 |
 | D-065 | Régie reprend les **quatre natures de travail** de `platform/conventions-specs.md` : **évolution**, **modification** (nouvelle spec qui cite celle qu'elle modifie), **correction** (rattachée à la spec livrée, sans revalidation métier), **rattrapage** | 🟡 Proposée | §5 bis |
 | D-066 | Point d'entrée unique **« Signaler »** : Régie pose la question décisive (« le comportement attendu est-il déjà décrit ? ») et oriente vers la bonne nature ; requalification correction → modification arbitrée par le lead technique | 🟡 Proposée | §5 bis |
@@ -192,6 +192,8 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-085 | **Administrateur de la plateforme** : crée les espaces et a le rôle Admin dans tous, sans rôle métier (pas de gate) ; un membre non habilité ne voit pas l'espace (404) | 🟡 Proposée | §7 |
 | D-086 | **Authentification MCP du POC par jetons d'agent personnels** (Bearer, hachés, révocables, avec expiration), en attendant le serveur OAuth 2.1 de D-028. L'agent agit par délégation (D-014) et l'historique affiche « Helix, pour le compte d'Alexandre » | 🟡 Proposée | §7, §9 |
 | D-087 | **MCP exposé via le proxy du front** (`/api/mcp`), transport HTTP sans état ; les jetons d'agent n'ouvrent que `/mcp`, pas l'API REST. Resources et prompts MCP (D-021) restent à faire | 🟡 Proposée | §9 |
+| D-088 | **Design system d'Alexandre** pour toute l'interface (remplace D-062) : tokens, polices, arrondis, ombres, densité ; vouvoiement conservé | ✅ Actée | §11 |
+| D-089 | **Workflow Git** : `develop` (intégration, par défaut, squash) et `main` (production, releases taguées en merge commit), protégées par des rulesets GitHub ; `preprod` à ajouter avec l'environnement | ✅ Actée | §12 bis |
 
 ---
 
@@ -546,7 +548,8 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 - **Inbox** : mentions, assignations, gates en attente, recettes KO.
 - **Dashboard** : répartition par statut et par projet, débit, lead time, couverture de recette, anomalies.
 - **D-024 🟡** Identité cinéma (nom, onboarding, messages), libellés fonctionnels dans l'UI.
-- **D-062 ✅** **Charte neutre et efficace**, distincte de la charte Xotis : palette sobre, une seule couleur d'accent, typographie système ou très lisible, densité adaptée à un outil de travail. Les maquettes du 2026-10-21 (charte Xotis) sont à reprendre.
+- **D-088 ✅** Régie suit le **design system d'Alexandre** (base tweakcn Claymorphism, contrastes corrigés) : tokens de couleur, polices Plus Jakarta Sans / Roboto Mono, arrondis et ombres « clay », densité 40 px. Interface au vouvoiement (outil d'équipe).
+- ~~**D-062** **Charte neutre et efficace**, distincte de la charte Xotis : palette sobre, une seule couleur d'accent, typographie système ou très lisible, densité adaptée à un outil de travail. Les maquettes du 2026-10-21 (charte Xotis) sont à reprendre.~~ 🔁 Remplacée par D-088 (2026-10-23).
 - **Navigation** : jugée peu claire sur les premières maquettes, à retravailler (cf. Q-023).
 
 ---
@@ -681,3 +684,4 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-22 | 0.18 | Domaine livré côté API (phase 4) : espaces, membres, évolutions, workflow, gates, révisions, commentaires, historique. Ajout de D-083 à D-085. |
 | 2026-10-22 | 0.19 | UI de la boucle Change (phase 5) : Ma boîte (gates à valider, assignations), board et liste filtrables, page évolution (Proposal · Plan · Tasks · Discussion · Historique), actions de gate. Q-023 : point d'entrée « Ma boîte », projet = filtre. |
 | 2026-10-22 | 0.20 | Serveur MCP livré (phase 6) : critère du POC (D-059) atteint, un agent crée une évolution via MCP et un humain la valide dans l'UI. Ajout de D-086 et D-087. |
+| 2026-10-23 | 0.21 | Release v0.1.0 (POC). D-088 : design system d'Alexandre (remplace D-062). D-089 : workflow Git develop / main et protections. |

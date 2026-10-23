@@ -14,13 +14,13 @@ export const metadata: Metadata = {
 /** Page de connexion, hors de la coquille de l'application (pas de sidebar). */
 export default function LoginPage() {
   return (
-    <main className="bg-muted/40 flex min-h-svh items-center justify-center p-6">
+    <main className="bg-background flex min-h-svh items-center justify-center p-6">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <div className="flex items-center justify-center gap-2">
           <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
             <Clapperboard className="size-4" />
           </span>
-          <span className="text-lg font-semibold">{APP_NAME}</span>
+          <span className="text-h4 font-extrabold">{APP_NAME}</span>
         </div>
         <Card>
           <CardHeader>
