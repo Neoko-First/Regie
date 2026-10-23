@@ -3,7 +3,13 @@
 import { Eye, EyeOff } from "lucide-react";
 import { type ComponentProps, useState } from "react";
 import { type Control, Controller, type FieldPath, type FieldValues } from "react-hook-form";
-import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -18,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -234,6 +241,46 @@ export function SelectField<TValues extends FieldValues, TTransformed = TValues>
           </Select>
           {description ? <FieldDescription>{description}</FieldDescription> : null}
           {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : null}
+        </Field>
+      )}
+    />
+  );
+}
+
+/** Propriétés de `SwitchField`. */
+export type SwitchFieldProps<TValues extends FieldValues, TTransformed = TValues> = BaseFieldProps<
+  TValues,
+  TTransformed
+>;
+
+/**
+ * Interrupteur (oui / non) lié au formulaire, avec son libellé et sa description à gauche.
+ *
+ * @example <SwitchField control={form.control} name="enabled" label="Activer Mailjet" />
+ */
+export function SwitchField<TValues extends FieldValues, TTransformed = TValues>({
+  control,
+  name,
+  label,
+  description,
+}: SwitchFieldProps<TValues, TTransformed>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+          <FieldContent>
+            <FieldLabel htmlFor={name}>{label}</FieldLabel>
+            {description ? <FieldDescription>{description}</FieldDescription> : null}
+          </FieldContent>
+          <Switch
+            id={name}
+            checked={Boolean(field.value)}
+            onCheckedChange={field.onChange}
+            onBlur={field.onBlur}
+            aria-invalid={fieldState.invalid}
+          />
         </Field>
       )}
     />

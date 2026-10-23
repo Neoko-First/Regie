@@ -35,4 +35,8 @@ export const queryKeys = {
   agentTokens: {
     all: ["agent-tokens"] as const,
   },
+  admin: {
+    all: ["admin"] as const,
+    mailSettings: () => [...queryKeys.admin.all, "mail-settings"] as const,
+  },
 } as const;

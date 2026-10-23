@@ -37,7 +37,7 @@ export function useChange(key: string) {
 }
 
 /** Utilisateur affiché sur un élément optimiste avant la réponse du serveur. */
-const UNKNOWN_USER: AuthUser = { id: "", name: "Moi", email: "" };
+const UNKNOWN_USER: AuthUser = { id: "", name: "Moi", email: "", isPlatformAdmin: false };
 
 /**
  * Création optimiste : la carte apparaît immédiatement dans la liste affichée,
