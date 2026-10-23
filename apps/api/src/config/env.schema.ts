@@ -3,6 +3,9 @@ import { z } from "@regie/shared";
 /** Port d'écoute par défaut de l'API en développement. */
 const DEFAULT_PORT = 4000;
 
+/** Longueur minimale d'un secret de signature (256 bits en hexadécimal ≈ 64 caractères). */
+const MIN_SECRET_LENGTH = 32;
+
 /**
  * Schéma des variables d'environnement de l'API, validé au démarrage (CLAUDE.md §13).
  * Une variable absente ou invalide empêche l'API de démarrer, avec un message explicite.
@@ -14,6 +17,16 @@ export const envSchema = z.object({
   DATABASE_URL: z.url(),
   /** Origine du front : seule origine autorisée par CORS et la vérification Origin */
   WEB_ORIGIN: z.url(),
+  /** Clé de signature des access tokens (HS256) : au moins 32 caractères aléatoires */
+  JWT_ACCESS_SECRET: z.string().min(MIN_SECRET_LENGTH),
+  /**
+   * Préfixe sous lequel le navigateur voit l'API (proxy BFF de Next.js).
+   * Sert à restreindre le chemin du cookie de refresh : `${prefix}/auth`.
+   */
+  PUBLIC_API_PREFIX: z
+    .string()
+    .regex(/^\/[\w-]+$/)
+    .default("/api"),
 });
 
 /** Variables d'environnement validées et typées. */

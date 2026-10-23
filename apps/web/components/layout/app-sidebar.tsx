@@ -4,6 +4,7 @@ import { APP_NAME } from "@regie/shared";
 import { Clapperboard, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import {
   Sidebar,
@@ -23,8 +24,10 @@ import { ThemeMenu } from "./theme-menu";
 
 /**
  * Barre latérale de l'application (shadcn `Sidebar`, variante `inset`, repliable en icônes).
+ *
+ * @param props.userMenu - Menu de l'utilisateur, rendu côté serveur (préchargement + Suspense)
  */
-export function AppSidebar() {
+export function AppSidebar({ userMenu }: { userMenu: ReactNode }) {
   const pathname = usePathname();
   const openCommandPalette = useCommandPaletteStore((s) => s.setOpen);
 
@@ -90,6 +93,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <ThemeMenu />
           </SidebarMenuItem>
+          <SidebarMenuItem>{userMenu}</SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />

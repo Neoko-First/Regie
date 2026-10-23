@@ -1,4 +1,5 @@
 import { type ApiErrorBody, ErrorCode } from "@regie/shared";
+import { loginUrl } from "@/features/auth/lib/safe-redirect";
 import { MESSAGES } from "./messages";
 
 // Client HTTP UNIQUE du navigateur (CLAUDE.md §3 et §5).
@@ -80,14 +81,46 @@ async function toApiError(response: Response): Promise<ApiError> {
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-async function request<TResponse>(
-  method: HttpMethod,
-  path: string,
-  body?: unknown,
-): Promise<TResponse> {
-  let response: Response;
+/** Statut HTTP « non authentifié » : access token absent ou expiré. */
+const HTTP_UNAUTHORIZED = 401;
+
+/** Routes d'auth pour lesquelles un 401 ne déclenche PAS de refresh (sinon boucle). */
+const NO_REFRESH_PATHS = new Set(["/auth/login", "/auth/refresh", "/auth/logout"]);
+
+/** Refresh en cours, partagé par toutes les requêtes qui reçoivent un 401 en même temps. */
+let pendingRefresh: Promise<boolean> | null = null;
+
+/**
+ * Renouvelle la session (rotation du refresh token). Un seul appel à la fois :
+ * les requêtes concurrentes attendent le même résultat au lieu de lancer chacune un refresh.
+ *
+ * @returns `true` si la session a été renouvelée
+ */
+function refreshSession(): Promise<boolean> {
+  pendingRefresh ??= fetch(`${API_BASE_PATH}/auth/refresh`, {
+    method: "POST",
+    credentials: "same-origin",
+  })
+    .then((response) => response.ok)
+    .catch(() => false)
+    .finally(() => {
+      pendingRefresh = null;
+    });
+  return pendingRefresh;
+}
+
+/** Session définitivement perdue : retour à la connexion, puis à la page courante. */
+function redirectToLogin(): void {
+  if (typeof window === "undefined") return;
+  const { pathname, search } = window.location;
+  // Navigation complète : le cache des données de l'ancienne session est vidé
+  window.location.assign(loginUrl(`${pathname}${search}`));
+}
+
+/** Envoie la requête au BFF ; une coupure réseau devient une `ApiError` normalisée. */
+async function send(method: HttpMethod, path: string, body?: unknown): Promise<Response> {
   try {
-    response = await fetch(`${API_BASE_PATH}${path}`, {
+    return await fetch(`${API_BASE_PATH}${path}`, {
       method,
       headers: body === undefined ? undefined : { "content-type": "application/json" },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -102,6 +135,23 @@ async function request<TResponse>(
       message: MESSAGES.errors.network,
     });
   }
+}
+
+async function request<TResponse>(
+  method: HttpMethod,
+  path: string,
+  body?: unknown,
+): Promise<TResponse> {
+  let response = await send(method, path, body);
+
+  // Access token expiré : refresh transparent puis une seule nouvelle tentative (CLAUDE.md §12.1)
+  if (response.status === HTTP_UNAUTHORIZED && !NO_REFRESH_PATHS.has(path)) {
+    if (await refreshSession()) {
+      response = await send(method, path, body);
+    } else {
+      redirectToLogin();
+    }
+  }
 
   if (!response.ok) throw await toApiError(response);
   if (response.status === HTTP_NO_CONTENT) return undefined as TResponse;
@@ -109,8 +159,8 @@ async function request<TResponse>(
 }
 
 /**
- * Client HTTP typé vers l'API, via le proxy BFF.
- * Le rafraîchissement transparent de session (401 → /auth/refresh) arrive avec l'auth (phase 3).
+ * Client HTTP typé vers l'API, via le proxy BFF. Gère le rafraîchissement transparent
+ * de la session : un 401 déclenche un refresh unique, puis la requête est rejouée.
  *
  * @example
  * const changes = await apiClient.get<Change[]>("/changes");

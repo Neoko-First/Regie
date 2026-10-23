@@ -8,7 +8,7 @@
 | **Porteur** | Alexandre |
 | **Statut du projet** | Développement du POC |
 | **Dernière mise à jour** | 2026-10-22 |
-| **Version du document** | 0.16 |
+| **Version du document** | 0.18 |
 
 ---
 
@@ -186,6 +186,10 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-079 | **Auth du POC** : auth maison (access token court + refresh token avec rotation, argon2id, politique de mot de passe partagée, sessions). Vérification d'email, reset et MFA viennent ensuite. Remplacement par un serveur OAuth 2.1 (D-028) à reconsidérer pour la V0 | ✅ Actée | §7 |
 | D-080 | **Libellé UI « Évolution »** (le modèle de code garde le nom `Change`) et **identifiants par espace** (`SOC-12`), appliquant D-071 | ✅ Actée | §5 ter, §11 |
 | D-081 | Le **serveur MCP est un module de l'API Nest** (transport HTTP streamable sur `/mcp`), qui réutilise services, guards et machine à états | ✅ Actée | §9 |
+| D-082 | **Pas d'inscription publique** dans le noyau d'auth : comptes créés par le seed en développement, puis par un admin (invitation) ; session = un appareil, révocable | 🟡 Proposée | §7 |
+| D-083 | **Workflow codé dans `@regie/shared`** : 11 transitions, rôles par transition (Gate 1 = PO, Gate 2 = Lead tech, Gate 3 = Recetteur), renvois arrière depuis la revue, la conception et la recette. Les **niveaux de cérémonie (D-023) ne sont pas encore appliqués** : toutes les natures suivent le cycle complet | 🟡 Proposée | §6 |
+| D-084 | Garde-fou **Q-022 appliqué strictement** : l'auteur d'une évolution ne valide jamais ses gates, même s'il détient le rôle. Si personne d'autre n'a le rôle, il faut l'attribuer à quelqu'un | 🟡 Proposée | §7 |
+| D-085 | **Administrateur de la plateforme** : crée les espaces et a le rôle Admin dans tous, sans rôle métier (pas de gate) ; un membre non habilité ne voit pas l'espace (404) | 🟡 Proposée | §7 |
 
 ---
 
@@ -671,3 +675,5 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-21 | 0.14 | Organisation par espaces et modules : §5 ter, D-069 à D-072. Q-031 résolue, Q-032. |
 | 2026-10-21 | 0.15 | Proposition d'organisation d'ensemble : §5 quater, D-073 à D-077. |
 | 2026-10-22 | 0.16 | Démarrage du développement du POC : D-078 (stack), D-079 (auth du POC), D-080 (libellé « Évolution » + ID par espace), D-081 (MCP dans l'API Nest). Q-007 résolue. |
+| 2026-10-22 | 0.17 | Noyau d'auth livré (D-079) : jetons, sessions, verrouillage, CSRF. Ajout de D-082 (pas d'inscription publique). |
+| 2026-10-22 | 0.18 | Domaine livré côté API (phase 4) : espaces, membres, évolutions, workflow, gates, révisions, commentaires, historique. Ajout de D-083 à D-085. |

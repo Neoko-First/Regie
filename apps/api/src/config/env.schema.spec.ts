@@ -3,6 +3,7 @@ import { validateEnv } from "./env.schema";
 const VALID_ENV = {
   DATABASE_URL: "postgresql://regie:regie@localhost:5433/regie",
   WEB_ORIGIN: "http://localhost:3000",
+  JWT_ACCESS_SECRET: "s".repeat(32),
 };
 
 describe("validateEnv", () => {

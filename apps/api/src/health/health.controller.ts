@@ -2,6 +2,7 @@ import { Controller, Get, HttpStatus } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { SkipThrottle } from "@nestjs/throttler";
 import { ErrorCode } from "@regie/shared";
+import { Public } from "../auth/decorators/public.decorator";
 import { AppException } from "../common/errors/app.exception";
 import { PrismaService } from "../prisma/prisma.service";
 
@@ -13,9 +14,10 @@ interface HealthStatus {
 
 /**
  * Point de santé, utilisé par la supervision et le déploiement.
- * Route publique, exclue du rate limiting.
+ * Route publique (sans session), exclue du rate limiting.
  */
 @ApiTags("Santé")
+@Public()
 @SkipThrottle()
 @Controller("health")
 export class HealthController {
