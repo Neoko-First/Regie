@@ -23,6 +23,9 @@ export const SESSION_MAX_TTL_MS = 30 * DAY_MS;
  */
 export const REFRESH_REUSE_GRACE_MS = 10 * SECOND_MS;
 
+/** Validité d'un lien de réinitialisation du mot de passe (CLAUDE.md §12.3 : ≈ 30 min). */
+export const PASSWORD_RESET_TTL_MS = 30 * MINUTE_MS;
+
 /** Nombre d'échecs de connexion consécutifs avant verrouillage temporaire du compte. */
 export const MAX_FAILED_LOGINS = 5;
 
@@ -36,6 +39,8 @@ export const OPAQUE_TOKEN_BYTES = 32;
 export const AUTH_THROTTLE = {
   login: { default: { limit: 10, ttl: MINUTE_MS } },
   refresh: { default: { limit: 60, ttl: MINUTE_MS } },
+  forgotPassword: { default: { limit: 5, ttl: MINUTE_MS } },
+  resetPassword: { default: { limit: 10, ttl: MINUTE_MS } },
 } as const;
 
 /** Message unique en cas d'échec de connexion : ne révèle pas si le compte existe. */

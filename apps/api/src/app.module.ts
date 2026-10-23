@@ -10,6 +10,7 @@ import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import { OriginGuard } from "./common/guards/origin.guard";
 import { AppConfigModule } from "./config/app-config.module";
 import { HealthModule } from "./health/health.module";
+import { MailModule } from "./mail/mail.module";
 import { McpModule } from "./mcp/mcp.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SpacesModule } from "./spaces/spaces.module";
@@ -35,6 +36,7 @@ const THROTTLE_LIMIT = 300;
     ChangesModule,
     AgentTokensModule,
     McpModule,
+    MailModule,
   ],
   providers: [
     // Validation des entrées par les DTO Zod partagés (createZodDto)

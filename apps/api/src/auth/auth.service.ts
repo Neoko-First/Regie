@@ -100,7 +100,15 @@ export class AuthService {
       },
     });
     const tokens = await this.issueTokens(user.id, session.id, session.expiresAt, now);
-    return { tokens, user: { id: user.id, email: user.email, name: user.name } };
+    return {
+      tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isPlatformAdmin: user.isPlatformAdmin,
+      },
+    };
   }
 
   /**
@@ -209,7 +217,7 @@ export class AuthService {
   async getMe(userId: string): Promise<AuthUser> {
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, isPlatformAdmin: true },
     });
     if (!user) throw sessionExpired();
     return user;
@@ -252,6 +260,20 @@ export class AuthService {
     if (count === 0) {
       throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, "Session introuvable.");
     }
+  }
+
+  /**
+   * Révoque toutes les sessions d'un utilisateur sauf une (changement de mot de passe :
+   * l'appareil courant reste connecté, les autres sont déconnectés).
+   *
+   * @param userId - Utilisateur concerné
+   * @param keepSessionId - Session à conserver
+   */
+  async revokeOtherSessions(userId: string, keepSessionId: string): Promise<void> {
+    await this.prisma.session.updateMany({
+      where: { userId, id: { not: keepSessionId }, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
   }
 
   /** Révoque les sessions correspondant au filtre (une session ou toutes celles d'un utilisateur). */

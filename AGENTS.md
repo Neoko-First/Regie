@@ -51,6 +51,14 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Tests e2e** (`pnpm --filter @regie/api test:e2e`) : base PostgreSQL réelle, app servie sous `/api` comme derrière le BFF. À enrichir pour toute modification de l'auth.
 - **Préchargement serveur** : `lib/server/prefetch.tsx` (`<Prefetch>`) sous un `<Suspense>` ; un Server Component ne peut pas rafraîchir la session, c'est le client qui prend le relais sur 401.
 
+## Emails et mots de passe (V0)
+
+- **Templates** : package `@regie/emails` (react-email), une fonction `render…Email()` par email qui renvoie `{ subject, html, text }`. Les couleurs sont en hexadécimal dans `src/theme.ts` (les clients mail ignorent les variables CSS) : seule exception à la règle des tokens. Aperçu : `pnpm --filter @regie/emails preview`.
+- **Envoi** : `MailService` (`apps/api/src/mail`) choisit le transport : capture en test, Mailjet si activé et complet en base, sinon `SMTP_URL` (Mailpit, interface sur http://localhost:8025). `sendInBackground` pour ne jamais faire attendre ni échouer une requête à cause d'un email.
+- **Clés Mailjet** : chiffrées AES-256-GCM (`SecretBoxService`, `SETTINGS_ENCRYPTION_KEY`), en écriture seule (l'API ne renvoie qu'un indice), réservées à l'administrateur de la plateforme.
+- **Mot de passe oublié** : réponse identique que le compte existe ou non ; jeton aléatoire haché (`VerificationToken`), usage unique, 30 min, consommé de façon conditionnelle. La réinitialisation révoque toutes les sessions et déverrouille le compte ; le changement (connecté) révoque les autres sessions. Chaque changement envoie une notification.
+- **Tests e2e** : Jest tourne sous `node --experimental-vm-modules` (le rendu react-email fait un import dynamique) ; le script `test:e2e` s'en charge.
+
 ## Domaine (phase 4)
 
 - **Le workflow est défini une seule fois** dans `packages/shared/src/domain/workflow.ts` (`TRANSITIONS`, `checkTransition`). L'API l'applique (`ChangeWorkflowService`), l'UI s'en sert pour afficher les boutons. Ne jamais coder une règle de transition ailleurs.

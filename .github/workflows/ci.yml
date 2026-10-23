@@ -35,6 +35,8 @@ jobs:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
       WEB_ORIGIN: http://localhost:3000
       JWT_ACCESS_SECRET: ci-only-secret-not-used-anywhere-else-0123456789
+      # 32 octets nuls en base64 : clé de CI uniquement, aucun secret réel n'est chiffré avec
+      SETTINGS_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       NODE_ENV: test
 
     steps:

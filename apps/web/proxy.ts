@@ -7,11 +7,21 @@ import { LOGIN_PATH, NEXT_PARAM } from "@/features/auth/lib/safe-redirect";
 // qui vérifie le jeton et la session à chaque requête.
 
 /** Pages accessibles sans session. */
-const PUBLIC_PATHS = new Set([LOGIN_PATH]);
+const PUBLIC_PATHS = new Set([LOGIN_PATH, "/forgot-password"]);
+
+/** Préfixes de pages publiques à paramètre (lien reçu par email). */
+const PUBLIC_PREFIXES = ["/reset-password/"];
+
+/** Indique si une page est accessible sans être connecté. */
+function isPublic(pathname: string): boolean {
+  return (
+    PUBLIC_PATHS.has(pathname) || PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  );
+}
 
 export function proxy(request: NextRequest): NextResponse {
   const { pathname, search } = request.nextUrl;
-  if (PUBLIC_PATHS.has(pathname)) return NextResponse.next();
+  if (isPublic(pathname)) return NextResponse.next();
 
   // Cookie indicateur posé par l'API, qui vit aussi longtemps que le refresh token
   if (request.cookies.has(AUTH_COOKIES.session)) return NextResponse.next();

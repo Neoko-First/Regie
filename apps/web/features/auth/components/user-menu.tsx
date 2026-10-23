@@ -1,6 +1,14 @@
 "use client";
 
-import { Bot, ChevronsUpDown, LogOut, MonitorSmartphone, ShieldOff } from "lucide-react";
+import {
+  Bot,
+  ChevronsUpDown,
+  KeyRound,
+  LogOut,
+  Mail,
+  MonitorSmartphone,
+  ShieldOff,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -54,10 +62,28 @@ export function UserMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
+            <Link href="/settings/security">
+              <KeyRound /> Mot de passe
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href="/settings/agent-tokens">
               <Bot /> Jetons d’agent
             </Link>
           </DropdownMenuItem>
+          {user.isPlatformAdmin ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-caption text-muted-foreground">
+                Administration
+              </DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link href="/admin/mail">
+                  <Mail /> Envoi des emails
+                </Link>
+              </DropdownMenuItem>
+            </>
+          ) : null}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => logout.mutate()} disabled={logout.isPending}>
             <LogOut /> Se déconnecter

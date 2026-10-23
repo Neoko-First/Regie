@@ -59,7 +59,12 @@ describe("Authentification (e2e)", () => {
     it("pose les cookies httpOnly sans jamais renvoyer de jeton dans le corps", async () => {
       const { user, loginResponse } = await loggedInClient();
 
-      expect(loginResponse.body).toEqual({ id: user.id, email: user.email, name: "Test e2e" });
+      expect(loginResponse.body).toEqual({
+        id: user.id,
+        email: user.email,
+        name: "Test e2e",
+        isPlatformAdmin: false,
+      });
       expect(JSON.stringify(loginResponse.body)).not.toMatch(/token/i);
       for (const name of Object.values(AUTH_COOKIES)) {
         expect(getSetCookie(loginResponse.headers, name)).toMatch(/HttpOnly/);

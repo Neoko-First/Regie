@@ -194,6 +194,8 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-087 | **MCP exposé via le proxy du front** (`/api/mcp`), transport HTTP sans état ; les jetons d'agent n'ouvrent que `/mcp`, pas l'API REST. Resources et prompts MCP (D-021) restent à faire | 🟡 Proposée | §9 |
 | D-088 | **Design system d'Alexandre** pour toute l'interface (remplace D-062) : tokens, polices, arrondis, ombres, densité ; vouvoiement conservé | ✅ Actée | §11 |
 | D-089 | **Workflow Git** : `develop` (intégration, par défaut, squash) et `main` (production, releases taguées en merge commit), protégées par des rulesets GitHub ; `preprod` à ajouter avec l'environnement | ✅ Actée | §12 bis |
+| D-090 | **Emails** : Mailjet, clés API configurables par l'administrateur de la plateforme dans l'interface, chiffrées en base (AES-256-GCM, clé en variable d'environnement), jamais réaffichées ; SMTP de repli (Mailpit) en développement | ✅ Actée | §12 bis |
+| D-091 | **Invitations** : un admin d'espace invite dans son espace, l'administrateur de la plateforme partout ; le compte est créé à l'acceptation du lien (jeton haché, usage unique, 7 jours) | ✅ Actée | §12 bis |
 
 ---
 
@@ -685,3 +687,4 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-22 | 0.19 | UI de la boucle Change (phase 5) : Ma boîte (gates à valider, assignations), board et liste filtrables, page évolution (Proposal · Plan · Tasks · Discussion · Historique), actions de gate. Q-023 : point d'entrée « Ma boîte », projet = filtre. |
 | 2026-10-22 | 0.20 | Serveur MCP livré (phase 6) : critère du POC (D-059) atteint, un agent crée une évolution via MCP et un humain la valide dans l'UI. Ajout de D-086 et D-087. |
 | 2026-10-23 | 0.21 | Release v0.1.0 (POC). D-088 : design system d'Alexandre (remplace D-062). D-089 : workflow Git develop / main et protections. |
+| 2026-10-23 | 0.22 | V0 pilotable, étape 1 : emails transactionnels, mot de passe oublié / réinitialisation / changement. D-090 (Mailjet configurable dans l'interface), D-091 (invitations par les admins d'espace). |

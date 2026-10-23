@@ -24,6 +24,8 @@ export const authUserSchema = z.object({
   id: z.string(),
   email: z.string(),
   name: z.string(),
+  /** Administrateur de la plateforme : accès à l'administration (espaces, emails) */
+  isPlatformAdmin: z.boolean(),
 });
 
 export type AuthUser = z.infer<typeof authUserSchema>;

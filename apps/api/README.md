@@ -28,12 +28,19 @@ pnpm --filter @regie/api dev              # http://localhost:4000, Swagger sur /
 
 Validées au démarrage par Zod (`src/config/env.schema.ts`) : l'API refuse de démarrer si l'une est invalide.
 
-| Variable       | Rôle                                                                    | Défaut        |
-| -------------- | ----------------------------------------------------------------------- | ------------- |
-| `NODE_ENV`     | `development`, `test` ou `production` (Swagger désactivé en production) | `development` |
-| `PORT`         | Port d'écoute                                                           | `4000`        |
-| `DATABASE_URL` | Connexion PostgreSQL                                                    | —             |
-| `WEB_ORIGIN`   | Origine du front (CORS, vérification Origin)                            | —             |
+| Variable                  | Rôle                                                                                                                                               | Défaut                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `NODE_ENV`                | `development`, `test` ou `production` (Swagger désactivé en production)                                                                            | `development`                 |
+| `PORT`                    | Port d'écoute                                                                                                                                      | `4000`                        |
+| `DATABASE_URL`            | Connexion PostgreSQL                                                                                                                               | —                             |
+| `WEB_ORIGIN`              | Origine du front (CORS, vérification Origin)                                                                                                       | —                             |
+| `JWT_ACCESS_SECRET`       | Clé de signature des access tokens (≥ 32 caractères aléatoires)                                                                                    | —                             |
+| `PUBLIC_API_PREFIX`       | Préfixe de l'API vu par le navigateur (chemin du cookie de refresh)                                                                                | `/api`                        |
+| `SETTINGS_ENCRYPTION_KEY` | Clé AES-256-GCM des secrets stockés en base (clés Mailjet), 32 octets en base64 : `openssl rand -base64 32`. La perdre oblige à ressaisir les clés | —                             |
+| `SMTP_URL`                | SMTP de repli quand Mailjet n'est pas configuré (Mailpit en dev : `smtp://localhost:1025`)                                                         | —                             |
+| `SMTP_FROM`               | Expéditeur utilisé avec le SMTP de repli                                                                                                           | `Régie <no-reply@regie.test>` |
+
+Envoi des emails : Mailjet si l'administrateur de la plateforme l'a activé et configuré dans « Administration › Envoi des emails » (clés chiffrées en base, jamais renvoyées par l'API), sinon `SMTP_URL`. En test (`NODE_ENV=test`), les emails sont capturés en mémoire.
 
 ## Organisation
 
