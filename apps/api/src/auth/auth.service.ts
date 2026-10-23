@@ -90,7 +90,22 @@ export class AuthService {
       where: { id: user.id },
       data: { failedLoginCount: 0, lockedUntil: null, ...(passwordHash ? { passwordHash } : {}) },
     });
+    return this.openSession(user, client, now);
+  }
 
+  /**
+   * Ouvre une session pour un utilisateur déjà authentifié (connexion, acceptation d'invitation).
+   *
+   * @param user - Utilisateur
+   * @param client - Appareil (user agent, IP)
+   * @param now - Instant de référence
+   * @returns Les jetons à poser en cookies et l'utilisateur connecté
+   */
+  async openSession(
+    user: { id: string; email: string; name: string; isPlatformAdmin: boolean },
+    client: ClientContext,
+    now = new Date(),
+  ): Promise<{ tokens: IssuedTokens; user: AuthUser }> {
     const session = await this.prisma.session.create({
       data: {
         userId: user.id,

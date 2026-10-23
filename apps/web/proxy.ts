@@ -10,7 +10,7 @@ import { LOGIN_PATH, NEXT_PARAM } from "@/features/auth/lib/safe-redirect";
 const PUBLIC_PATHS = new Set([LOGIN_PATH, "/forgot-password"]);
 
 /** Préfixes de pages publiques à paramètre (lien reçu par email). */
-const PUBLIC_PREFIXES = ["/reset-password/"];
+const PUBLIC_PREFIXES = ["/reset-password/", "/invitation/"];
 
 /** Indique si une page est accessible sans être connecté. */
 function isPublic(pathname: string): boolean {

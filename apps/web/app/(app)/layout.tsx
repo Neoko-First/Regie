@@ -20,7 +20,12 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       <AppSidebar
         userMenu={
           <Suspense fallback={<UserMenuSkeleton />}>
-            <Prefetch requests={[{ query: meQuery(), path: "/auth/me" }]}>
+            <Prefetch
+              requests={[
+                { query: meQuery(), path: "/auth/me" },
+                { query: spacesQuery(), path: "/spaces" },
+              ]}
+            >
               <UserMenu />
             </Prefetch>
           </Suspense>
