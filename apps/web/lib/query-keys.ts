@@ -19,6 +19,7 @@ export const queryKeys = {
     all: ["spaces"] as const,
     list: () => [...queryKeys.spaces.all, "list"] as const,
     members: (spaceKey: string) => [...queryKeys.spaces.all, "members", spaceKey] as const,
+    invitations: (spaceKey: string) => [...queryKeys.spaces.all, "invitations", spaceKey] as const,
   },
   changes: {
     all: ["changes"] as const,
@@ -29,10 +30,18 @@ export const queryKeys = {
     activity: (key: string) => [...queryKeys.changes.detail(key), "activity"] as const,
     revisions: (key: string) => [...queryKeys.changes.detail(key), "revisions"] as const,
   },
+  invitations: {
+    all: ["invitations"] as const,
+    preview: (token: string) => [...queryKeys.invitations.all, "preview", token] as const,
+  },
   inbox: {
     all: ["inbox"] as const,
   },
   agentTokens: {
     all: ["agent-tokens"] as const,
+  },
+  admin: {
+    all: ["admin"] as const,
+    mailSettings: () => [...queryKeys.admin.all, "mail-settings"] as const,
   },
 } as const;

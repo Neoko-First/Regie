@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type LoginInput, loginSchema } from "@regie/shared";
 import { Loader2, LogIn } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,9 @@ export function LoginForm() {
       </FieldGroup>
       <Button type="submit" disabled={!isDirty || isSubmitting}>
         {isSubmitting ? <Loader2 className="animate-spin" /> : <LogIn />} Se connecter
+      </Button>
+      <Button asChild variant="link" size="sm" className="self-center">
+        <Link href="/forgot-password">Mot de passe oublié ?</Link>
       </Button>
     </form>
   );

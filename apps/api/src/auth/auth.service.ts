@@ -90,7 +90,22 @@ export class AuthService {
       where: { id: user.id },
       data: { failedLoginCount: 0, lockedUntil: null, ...(passwordHash ? { passwordHash } : {}) },
     });
+    return this.openSession(user, client, now);
+  }
 
+  /**
+   * Ouvre une session pour un utilisateur déjà authentifié (connexion, acceptation d'invitation).
+   *
+   * @param user - Utilisateur
+   * @param client - Appareil (user agent, IP)
+   * @param now - Instant de référence
+   * @returns Les jetons à poser en cookies et l'utilisateur connecté
+   */
+  async openSession(
+    user: { id: string; email: string; name: string; isPlatformAdmin: boolean },
+    client: ClientContext,
+    now = new Date(),
+  ): Promise<{ tokens: IssuedTokens; user: AuthUser }> {
     const session = await this.prisma.session.create({
       data: {
         userId: user.id,
@@ -100,7 +115,15 @@ export class AuthService {
       },
     });
     const tokens = await this.issueTokens(user.id, session.id, session.expiresAt, now);
-    return { tokens, user: { id: user.id, email: user.email, name: user.name } };
+    return {
+      tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isPlatformAdmin: user.isPlatformAdmin,
+      },
+    };
   }
 
   /**
@@ -209,7 +232,7 @@ export class AuthService {
   async getMe(userId: string): Promise<AuthUser> {
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, isPlatformAdmin: true },
     });
     if (!user) throw sessionExpired();
     return user;
@@ -252,6 +275,20 @@ export class AuthService {
     if (count === 0) {
       throw new AppException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, "Session introuvable.");
     }
+  }
+
+  /**
+   * Révoque toutes les sessions d'un utilisateur sauf une (changement de mot de passe :
+   * l'appareil courant reste connecté, les autres sont déconnectés).
+   *
+   * @param userId - Utilisateur concerné
+   * @param keepSessionId - Session à conserver
+   */
+  async revokeOtherSessions(userId: string, keepSessionId: string): Promise<void> {
+    await this.prisma.session.updateMany({
+      where: { userId, id: { not: keepSessionId }, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
   }
 
   /** Révoque les sessions correspondant au filtre (une session ou toutes celles d'un utilisateur). */

@@ -1,9 +1,15 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 import { type ComponentProps, useState } from "react";
 import { type Control, Controller, type FieldPath, type FieldValues } from "react-hook-form";
-import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -18,7 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Champs de formulaire standard : React Hook Form (Controller) + composants `Field` de shadcn.
@@ -232,6 +240,105 @@ export function SelectField<TValues extends FieldValues, TTransformed = TValues>
               ))}
             </SelectContent>
           </Select>
+          {description ? <FieldDescription>{description}</FieldDescription> : null}
+          {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : null}
+        </Field>
+      )}
+    />
+  );
+}
+
+/** Propriétés de `SwitchField`. */
+export type SwitchFieldProps<TValues extends FieldValues, TTransformed = TValues> = BaseFieldProps<
+  TValues,
+  TTransformed
+>;
+
+/**
+ * Interrupteur (oui / non) lié au formulaire, avec son libellé et sa description à gauche.
+ *
+ * @example <SwitchField control={form.control} name="enabled" label="Activer Mailjet" />
+ */
+export function SwitchField<TValues extends FieldValues, TTransformed = TValues>({
+  control,
+  name,
+  label,
+  description,
+}: SwitchFieldProps<TValues, TTransformed>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+          <FieldContent>
+            <FieldLabel htmlFor={name}>{label}</FieldLabel>
+            {description ? <FieldDescription>{description}</FieldDescription> : null}
+          </FieldContent>
+          <Switch
+            id={name}
+            checked={Boolean(field.value)}
+            onCheckedChange={field.onChange}
+            onBlur={field.onBlur}
+            aria-invalid={fieldState.invalid}
+          />
+        </Field>
+      )}
+    />
+  );
+}
+
+/** Propriétés de `MultiToggleField`. */
+export type MultiToggleFieldProps<
+  TValues extends FieldValues,
+  TTransformed = TValues,
+> = BaseFieldProps<TValues, TTransformed> & {
+  options: readonly SelectOption[];
+};
+
+/**
+ * Choix multiple sous forme de boutons bascule (ex. rôles cumulables d'un membre).
+ * La valeur du champ est un tableau des valeurs sélectionnées.
+ *
+ * @example <MultiToggleField control={form.control} name="roles" label="Rôles" options={ROLE_OPTIONS} />
+ */
+export function MultiToggleField<TValues extends FieldValues, TTransformed = TValues>({
+  control,
+  name,
+  label,
+  description,
+  options,
+}: MultiToggleFieldProps<TValues, TTransformed>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel id={`${name}-label`}>{label}</FieldLabel>
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            size="sm"
+            className="flex-wrap"
+            aria-labelledby={`${name}-label`}
+            value={Array.isArray(field.value) ? (field.value as string[]) : []}
+            onValueChange={field.onChange}
+            onBlur={field.onBlur}
+            aria-invalid={fieldState.invalid}
+          >
+            {options.map((option) => (
+              <ToggleGroupItem
+                key={option.value}
+                value={option.value}
+                // Sélection marquée par la couleur ET une coche (jamais par la couleur seule)
+                className="data-[state=on]:border-primary data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
+              >
+                <Check className="hidden group-data-[state=on]/toggle:block" aria-hidden />
+                {option.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
           {description ? <FieldDescription>{description}</FieldDescription> : null}
           {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : null}
         </Field>

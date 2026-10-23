@@ -1,6 +1,15 @@
 "use client";
 
-import { Bot, ChevronsUpDown, LogOut, MonitorSmartphone, ShieldOff } from "lucide-react";
+import {
+  Bot,
+  ChevronsUpDown,
+  KeyRound,
+  LogOut,
+  Mail,
+  MonitorSmartphone,
+  ShieldOff,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -16,6 +25,9 @@ import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/ui-extended/confirm-dialog";
 import { initials } from "@/components/ui-extended/user-avatar";
+import { ADMIN_SPACES_PATH } from "@/features/spaces/constants";
+import { useSpaces } from "@/features/spaces/hooks/use-spaces";
+import { hasAnyRole } from "@regie/shared";
 import { useCurrentUser } from "../hooks/use-current-user";
 import { useLogout, useLogoutAll } from "../hooks/use-logout";
 import { LOGOUT_ALL_DESCRIPTION } from "../messages";
@@ -26,6 +38,8 @@ import { LOGOUT_ALL_DESCRIPTION } from "../messages";
  */
 export function UserMenu() {
   const user = useCurrentUser();
+  // Administration visible pour l'admin de la plateforme et les admins d'au moins un espace
+  const adminsASpace = useSpaces().some((space) => hasAnyRole(space.myRoles, ["ADMIN"]));
   const logout = useLogout();
   const logoutAll = useLogoutAll();
   const [confirmLogoutAll, setConfirmLogoutAll] = useState(false);
@@ -54,10 +68,35 @@ export function UserMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
+            <Link href="/settings/security">
+              <KeyRound /> Mot de passe
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href="/settings/agent-tokens">
               <Bot /> Jetons d’agent
             </Link>
           </DropdownMenuItem>
+          {user.isPlatformAdmin || adminsASpace ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-caption text-muted-foreground">
+                Administration
+              </DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link href={ADMIN_SPACES_PATH}>
+                  <Users /> Espaces et membres
+                </Link>
+              </DropdownMenuItem>
+              {user.isPlatformAdmin ? (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/mail">
+                    <Mail /> Envoi des emails
+                  </Link>
+                </DropdownMenuItem>
+              ) : null}
+            </>
+          ) : null}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => logout.mutate()} disabled={logout.isPending}>
             <LogOut /> Se déconnecter

@@ -47,9 +47,25 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 
 - **Jetons** : access token JWT (15 min, cookie `regie_at`) + refresh token opaque haché en base (cookie `regie_rt`, limité à `/api/auth`), rotation à chaque usage, réutilisation après 10 s de grâce = révocation de la session. Cookie indicateur `regie_session` (sans secret) lu par `apps/web/proxy.ts`.
 - **Toutes les routes de l'API exigent une session** (`AccessTokenGuard` global), sauf `@Public()`. Les requêtes mutantes authentifiées par cookie doivent porter l'`Origin` du front (`OriginGuard`).
-- **Pas d'inscription publique** : les comptes de développement viennent du seed (`pnpm --filter @regie/api db:seed`, mot de passe `SEED_USER_PASSWORD`). La création de comptes par un admin viendra plus tard.
+- **Pas d'inscription publique** : les comptes de développement viennent du seed (`pnpm --filter @regie/api db:seed`, mot de passe `SEED_USER_PASSWORD`) ; les autres sont créés par invitation (section « Membres et invitations »).
 - **Tests e2e** (`pnpm --filter @regie/api test:e2e`) : base PostgreSQL réelle, app servie sous `/api` comme derrière le BFF. À enrichir pour toute modification de l'auth.
 - **Préchargement serveur** : `lib/server/prefetch.tsx` (`<Prefetch>`) sous un `<Suspense>` ; un Server Component ne peut pas rafraîchir la session, c'est le client qui prend le relais sur 401.
+
+## Emails et mots de passe (V0)
+
+- **Templates** : package `@regie/emails` (react-email), une fonction `render…Email()` par email qui renvoie `{ subject, html, text }`. Les couleurs sont en hexadécimal dans `src/theme.ts` (les clients mail ignorent les variables CSS) : seule exception à la règle des tokens. Aperçu : `pnpm --filter @regie/emails preview`.
+- **Envoi** : `MailService` (`apps/api/src/mail`) choisit le transport : capture en test, Mailjet si activé et complet en base, sinon `SMTP_URL` (Mailpit, interface sur http://localhost:8025). `sendInBackground` pour ne jamais faire attendre ni échouer une requête à cause d'un email.
+- **Clés Mailjet** : chiffrées AES-256-GCM (`SecretBoxService`, `SETTINGS_ENCRYPTION_KEY`), en écriture seule (l'API ne renvoie qu'un indice), réservées à l'administrateur de la plateforme.
+- **Mot de passe oublié** : réponse identique que le compte existe ou non ; jeton aléatoire haché (`VerificationToken`), usage unique, 30 min, consommé de façon conditionnelle. La réinitialisation révoque toutes les sessions et déverrouille le compte ; le changement (connecté) révoque les autres sessions. Chaque changement envoie une notification.
+- **Tests e2e** : Jest tourne sous `node --experimental-vm-modules` (le rendu react-email fait un import dynamique) ; le script `test:e2e` s'en charge.
+
+## Membres et invitations (V0, D-091)
+
+- **Ajout par email** (`POST /spaces/:key/members`, module `apps/api/src/invitations`) : une personne qui a déjà un compte est rattachée tout de suite (email « Vous avez rejoint… ») ; sinon une `Invitation` est créée (jeton haché, 7 jours, usage unique) et envoyée. Réservé aux admins de l'espace (et à l'administrateur de la plateforme, admin partout).
+- **Une invitation en attente par adresse et par espace** : renvoyer ou réinviter révoque le lien précédent.
+- **Acceptation** (`/invitation/[token]`, routes publiques `GET /invitations/:token` et `POST /invitations/accept`) : crée le compte, rattache à TOUS les espaces où une invitation valable attend la même adresse, puis ouvre une session (`AuthService.openSession`).
+- **Garde-fou** : un espace garde toujours au moins un membre ADMIN (retrait ou rétrogradation refusés en 409). Personne ne peut nommer un administrateur de la plateforme par l'API.
+- **UI** : « Administration › Espaces et membres » (`/admin/spaces`), visible par l'administrateur de la plateforme et les admins d'au moins un espace.
 
 ## Domaine (phase 4)
 

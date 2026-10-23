@@ -11,6 +11,10 @@ import { toUserSummary, USER_SUMMARY_SELECT } from "../common/user-summary";
 import { PrismaService } from "../prisma/prisma.service";
 import { SpaceAccessService } from "./space-access.service";
 
+/** Message quand une modification laisserait l'espace sans administrateur. */
+const LAST_ADMIN_MESSAGE =
+  "L'espace doit garder au moins un admin : nommez-en un autre avant de retirer celui-ci.";
+
 /** Données validées de création d'espace (après transformation Zod). */
 type CreateSpaceData = Required<Pick<CreateSpaceInput, "key" | "name" | "description">>;
 
@@ -118,7 +122,8 @@ export class SpacesService {
    * @param memberId - Utilisateur concerné
    * @param input - Nouveaux rôles (remplacent les précédents)
    * @returns Le membre mis à jour
-   * @throws AppException 403 si l'utilisateur n'est pas admin de l'espace, 404 si le membre n'existe pas
+   * @throws AppException 403 si l'utilisateur n'est pas admin de l'espace, 404 si le membre
+   * n'existe pas, 409 si l'espace perdrait son dernier admin
    */
   async setMemberRoles(
     userId: string,
@@ -134,6 +139,7 @@ export class SpacesService {
       select: USER_SUMMARY_SELECT,
     });
     if (!user) throw notFound("Utilisateur introuvable.");
+    if (!input.roles.includes("ADMIN")) await this.assertKeepsAnAdmin(space.id, memberId);
 
     const membership = await this.prisma.membership.upsert({
       where: { spaceId_userId: { spaceId: space.id, userId: memberId } },
@@ -149,14 +155,33 @@ export class SpacesService {
    * @param userId - Administrateur qui agit
    * @param spaceKey - Clé de l'espace
    * @param memberId - Membre à retirer
-   * @throws AppException 403 si l'utilisateur n'est pas admin, 404 si ce n'est pas un membre
+   * @throws AppException 403 si l'utilisateur n'est pas admin, 404 si ce n'est pas un membre,
+   * 409 s'il s'agit du dernier admin de l'espace
    */
   async removeMember(userId: string, spaceKey: string, memberId: string): Promise<void> {
     const { space, roles } = await this.access.requireAccess(userId, spaceKey);
     this.access.assertRoles(roles, ["ADMIN"]);
+    await this.assertKeepsAnAdmin(space.id, memberId);
     const { count } = await this.prisma.membership.deleteMany({
       where: { spaceId: space.id, userId: memberId },
     });
     if (count === 0) throw notFound("Ce membre ne fait pas partie de l'espace.");
+  }
+
+  /**
+   * Refuse de retirer le rôle ADMIN au dernier admin d'un espace (l'espace deviendrait
+   * ingérable sans l'administrateur de la plateforme).
+   *
+   * @param spaceId - Espace
+   * @param memberId - Membre qui perdrait le rôle ADMIN
+   * @throws AppException 409 si c'est le dernier admin
+   */
+  private async assertKeepsAnAdmin(spaceId: string, memberId: string): Promise<void> {
+    const admins = await this.prisma.membership.findMany({
+      where: { spaceId, roles: { has: "ADMIN" }, user: { deletedAt: null } },
+      select: { userId: true },
+    });
+    const isAdmin = admins.some((admin) => admin.userId === memberId);
+    if (isAdmin && admins.length === 1) throw conflict(LAST_ADMIN_MESSAGE);
   }
 }

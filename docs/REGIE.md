@@ -186,7 +186,7 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-079 | **Auth du POC** : auth maison (access token court + refresh token avec rotation, argon2id, politique de mot de passe partagée, sessions). Vérification d'email, reset et MFA viennent ensuite. Remplacement par un serveur OAuth 2.1 (D-028) à reconsidérer pour la V0 | ✅ Actée | §7 |
 | D-080 | **Libellé UI « Évolution »** (le modèle de code garde le nom `Change`) et **identifiants par espace** (`SOC-12`), appliquant D-071 | ✅ Actée | §5 ter, §11 |
 | D-081 | Le **serveur MCP est un module de l'API Nest** (transport HTTP streamable sur `/mcp`), qui réutilise services, guards et machine à états | ✅ Actée | §9 |
-| D-082 | **Pas d'inscription publique** dans le noyau d'auth : comptes créés par le seed en développement, puis par un admin (invitation) ; session = un appareil, révocable | 🟡 Proposée | §7 |
+| D-082 | **Pas d'inscription publique** dans le noyau d'auth : comptes créés par le seed en développement, puis par un admin (invitation, D-091) ; session = un appareil, révocable | ✅ Actée | §7 |
 | D-083 | **Workflow codé dans `@regie/shared`** : 11 transitions, rôles par transition (Gate 1 = PO, Gate 2 = Lead tech, Gate 3 = Recetteur), renvois arrière depuis la revue, la conception et la recette. Les **niveaux de cérémonie (D-023) ne sont pas encore appliqués** : toutes les natures suivent le cycle complet | 🟡 Proposée | §6 |
 | D-084 | Garde-fou **Q-022 appliqué strictement** : l'auteur d'une évolution ne valide jamais ses gates, même s'il détient le rôle. Si personne d'autre n'a le rôle, il faut l'attribuer à quelqu'un | 🟡 Proposée | §7 |
 | D-085 | **Administrateur de la plateforme** : crée les espaces et a le rôle Admin dans tous, sans rôle métier (pas de gate) ; un membre non habilité ne voit pas l'espace (404) | 🟡 Proposée | §7 |
@@ -194,6 +194,9 @@ Vue synthétique. Le détail se trouve dans les sections thématiques.
 | D-087 | **MCP exposé via le proxy du front** (`/api/mcp`), transport HTTP sans état ; les jetons d'agent n'ouvrent que `/mcp`, pas l'API REST. Resources et prompts MCP (D-021) restent à faire | 🟡 Proposée | §9 |
 | D-088 | **Design system d'Alexandre** pour toute l'interface (remplace D-062) : tokens, polices, arrondis, ombres, densité ; vouvoiement conservé | ✅ Actée | §11 |
 | D-089 | **Workflow Git** : `develop` (intégration, par défaut, squash) et `main` (production, releases taguées en merge commit), protégées par des rulesets GitHub ; `preprod` à ajouter avec l'environnement | ✅ Actée | §12 bis |
+| D-090 | **Emails** : Mailjet, clés API configurables par l'administrateur de la plateforme dans l'interface, chiffrées en base (AES-256-GCM, clé en variable d'environnement), jamais réaffichées ; SMTP de repli (Mailpit) en développement | ✅ Actée | §12 bis |
+| D-091 | **Invitations** : un admin d'espace invite dans son espace, l'administrateur de la plateforme partout ; le compte est créé à l'acceptation du lien (jeton haché, usage unique, 7 jours) | ✅ Actée | §12 bis |
+| D-092 | **Logo** : le « clap validé » (clap de cinéma, D-024, marqué d'une coche), sur fond `--primary` ; version compacte sous 32 px ; kit dans `docs/brand/` | ✅ Actée | §11 |
 
 ---
 
@@ -685,3 +688,6 @@ Nombre d'incidents par sévérité et par produit, temps de détection, **temps 
 | 2026-10-22 | 0.19 | UI de la boucle Change (phase 5) : Ma boîte (gates à valider, assignations), board et liste filtrables, page évolution (Proposal · Plan · Tasks · Discussion · Historique), actions de gate. Q-023 : point d'entrée « Ma boîte », projet = filtre. |
 | 2026-10-22 | 0.20 | Serveur MCP livré (phase 6) : critère du POC (D-059) atteint, un agent crée une évolution via MCP et un humain la valide dans l'UI. Ajout de D-086 et D-087. |
 | 2026-10-23 | 0.21 | Release v0.1.0 (POC). D-088 : design system d'Alexandre (remplace D-062). D-089 : workflow Git develop / main et protections. |
+| 2026-10-23 | 0.22 | V0 pilotable, étape 1 : emails transactionnels, mot de passe oublié / réinitialisation / changement. D-090 (Mailjet configurable dans l'interface), D-091 (invitations par les admins d'espace). |
+| 2026-10-23 | 0.23 | V0 pilotable, étape 2 : invitations par email, administration des espaces et des membres (D-091 livrée), garde-fou du dernier admin. D-082 actée. |
+| 2026-10-23 | 0.24 | D-092 : logo « clap validé » (icône, favicon clair / sombre, icônes PWA et iOS, wordmark). |

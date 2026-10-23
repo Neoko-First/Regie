@@ -35,14 +35,54 @@ model User {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  sessions        Session[]
-  memberships     Membership[]
-  authoredChanges Change[]       @relation("ChangeAuthor")
-  assignedChanges Change[]       @relation("ChangeAssignee")
-  gateApprovals   GateApproval[]
-  comments        Comment[]
-  activities      Activity[]
-  agentTokens     AgentToken[]
+  sessions           Session[]
+  memberships        Membership[]
+  authoredChanges    Change[]            @relation("ChangeAuthor")
+  assignedChanges    Change[]            @relation("ChangeAssignee")
+  gateApprovals      GateApproval[]
+  comments           Comment[]
+  activities         Activity[]
+  agentTokens        AgentToken[]
+  verificationTokens VerificationToken[]
+  sentInvitations    Invitation[]
+}
+
+/// Usages des jetons envoyés par email.
+enum VerificationTokenType {
+  PASSWORD_RESET
+}
+
+/// Jeton envoyé par email (réinitialisation du mot de passe…) : aléatoire, stocké haché,
+/// à usage unique et à durée courte (CLAUDE.md §12.3, §14).
+model VerificationToken {
+  id        String                @id @default(uuid(7))
+  userId    String
+  type      VerificationTokenType
+  tokenHash String                @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+/// Réglages d'envoi des emails (une seule ligne, id « default »). Les clés Mailjet sont
+/// chiffrées (AES-256-GCM, clé SETTINGS_ENCRYPTION_KEY) et ne sont jamais renvoyées par l'API.
+model MailSettings {
+  id                 String   @id @default("default")
+  senderEmail        String
+  senderName         String
+  enabled            Boolean  @default(false)
+  apiKeyEncrypted    String?
+  /// 4 derniers caractères de la clé API, pour la reconnaître dans l'interface
+  apiKeyHint         String?
+  secretKeyEncrypted String?
+  updatedById        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 /// Jeton d'agent IA (D-014) : un agent agit PAR DÉLÉGATION d'un humain, avec ses droits,
@@ -170,6 +210,7 @@ model Space {
 
   memberships Membership[]
   changes     Change[]
+  invitations Invitation[]
 }
 
 /// Appartenance d'un utilisateur à un espace, avec des rôles cumulables (D-063).
@@ -286,4 +327,28 @@ model Activity {
   actor  User   @relation(fields: [actorId], references: [id])
 
   @@index([changeId, createdAt])
+}
+
+/// Invitation à rejoindre un espace (D-091). Le compte est créé à l'acceptation du lien.
+/// Une seule invitation en attente par adresse et par espace : la renvoyer remplace son jeton.
+model Invitation {
+  id          String      @id @default(uuid(7))
+  spaceId     String
+  /// Toujours stocké normalisé (minuscules, sans espaces)
+  email       String
+  roles       SpaceRole[]
+  /// Hash SHA-256 du jeton du lien : le jeton lui-même n'est jamais stocké
+  tokenHash   String      @unique
+  invitedById String
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  space     Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  invitedBy User  @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([spaceId, email])
+  @@index([email])
 }

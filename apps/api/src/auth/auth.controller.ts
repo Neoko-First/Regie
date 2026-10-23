@@ -18,21 +18,12 @@ import type { Request, Response } from "express";
 import { AUTH_THROTTLE } from "./auth.constants";
 import { AuthCookiesService } from "./auth-cookies.service";
 import { AuthService, sessionExpired } from "./auth.service";
-import type { AuthContext, ClientContext } from "./auth.types";
+import type { AuthContext } from "./auth.types";
+import { clientContext } from "./client-context";
 import { CurrentAuth } from "./decorators/current-auth.decorator";
 import { Public } from "./decorators/public.decorator";
-import { LoginDto } from "./dto/login.dto";
-
-/** Longueur maximale conservée du user agent (évite de stocker des en-têtes démesurés). */
-const USER_AGENT_MAX_LENGTH = 512;
-
-/** Extrait l'appareil et l'IP de la requête (IP réelle transmise par le proxy BFF). */
-function clientContext(req: Request): ClientContext {
-  return {
-    userAgent: req.headers["user-agent"]?.slice(0, USER_AGENT_MAX_LENGTH) ?? null,
-    ip: req.ip ?? null,
-  };
-}
+import { ChangePasswordDto, ForgotPasswordDto, LoginDto, ResetPasswordDto } from "./dto/login.dto";
+import { PasswordFlowsService } from "./password-flows.service";
 
 /** Lit le refresh token dans son cookie. */
 function readRefreshToken(req: Request): string | undefined {
@@ -50,6 +41,7 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly cookies: AuthCookiesService,
+    private readonly passwordFlows: PasswordFlowsService,
   ) {}
 
   /** Connexion par email et mot de passe. Rate limiting renforcé. */
@@ -109,6 +101,43 @@ export class AuthController {
   ): Promise<void> {
     await this.auth.logoutAll(auth.userId);
     this.cookies.clear(res);
+  }
+
+  /**
+   * Mot de passe oublié : envoie un lien de réinitialisation si le compte existe.
+   * Répond toujours 204, que l'adresse ait un compte ou non.
+   */
+  @Public()
+  @Throttle(AUTH_THROTTLE.forgotPassword)
+  @Post("forgot-password")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: "Demande prise en compte (réponse identique dans tous les cas).",
+  })
+  async forgotPassword(@Body() body: ForgotPasswordDto): Promise<void> {
+    await this.passwordFlows.requestReset(body.email);
+  }
+
+  /** Nouveau mot de passe depuis le lien reçu par email ; révoque toutes les sessions. */
+  @Public()
+  @Throttle(AUTH_THROTTLE.resetPassword)
+  @Post("reset-password")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: "Mot de passe réinitialisé, sessions révoquées." })
+  async resetPassword(@Body() body: ResetPasswordDto): Promise<void> {
+    await this.passwordFlows.reset(body);
+  }
+
+  /** Changement de mot de passe par l'utilisateur connecté ; révoque ses autres sessions. */
+  @Throttle(AUTH_THROTTLE.resetPassword)
+  @Post("change-password")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: "Mot de passe modifié, autres sessions révoquées." })
+  async changePassword(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: ChangePasswordDto,
+  ): Promise<void> {
+    await this.passwordFlows.change(auth, body);
   }
 
   /** Utilisateur connecté. */

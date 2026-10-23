@@ -45,3 +45,12 @@ export function invalidField(field: string, message: string): AppException {
     [field]: [message],
   });
 }
+
+/**
+ * 400 sans champ précis : demande inutilisable (lien expiré ou déjà utilisé…).
+ *
+ * @param message - Motif lisible
+ */
+export function badRequest(message: string): AppException {
+  return new AppException(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, message);
+}

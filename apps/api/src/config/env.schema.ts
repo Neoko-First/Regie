@@ -6,6 +6,9 @@ const DEFAULT_PORT = 4000;
 /** Longueur minimale d'un secret de signature (256 bits en hexadécimal ≈ 64 caractères). */
 const MIN_SECRET_LENGTH = 32;
 
+/** Taille d'une clé AES-256. */
+const ENCRYPTION_KEY_BYTES = 32;
+
 /**
  * Schéma des variables d'environnement de l'API, validé au démarrage (CLAUDE.md §13).
  * Une variable absente ou invalide empêche l'API de démarrer, avec un message explicite.
@@ -27,6 +30,19 @@ export const envSchema = z.object({
     .string()
     .regex(/^\/[\w-]+$/)
     .default("/api"),
+  /**
+   * Clé de chiffrement des secrets stockés en base (clés Mailjet) : 32 octets en base64.
+   * La perdre rend les secrets enregistrés illisibles (il faudra les ressaisir).
+   */
+  SETTINGS_ENCRYPTION_KEY: z
+    .string()
+    .refine((value) => Buffer.from(value, "base64").length === ENCRYPTION_KEY_BYTES, {
+      error: "Doit faire 32 octets encodés en base64.",
+    }),
+  /** Serveur SMTP de repli quand Mailjet n'est pas configuré (Mailpit en développement) */
+  SMTP_URL: z.url().optional(),
+  /** Expéditeur utilisé avec le SMTP de repli */
+  SMTP_FROM: z.string().default("Régie <no-reply@regie.test>"),
 });
 
 /** Variables d'environnement validées et typées. */
