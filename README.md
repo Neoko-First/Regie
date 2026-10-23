@@ -25,6 +25,17 @@ cp apps/web/.env.example apps/web/.env.local
 pnpm dev        # front sur http://localhost:3000, API sur http://localhost:4000
 ```
 
+## Connecter un agent IA (MCP)
+
+1. Dans Régie : menu utilisateur → **Jetons d'agent** → **Nouveau jeton**.
+2. Copier la commande affichée (une seule fois), par exemple pour Claude Code :
+
+```bash
+claude mcp add --transport http regie http://localhost:3000/api/mcp --header "Authorization: Bearer <jeton>"
+```
+
+L'agent peut proposer, rédiger, commenter et faire avancer des évolutions en votre nom ; il ne peut jamais valider un gate.
+
 ## Structure
 
 ```

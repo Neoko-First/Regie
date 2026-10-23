@@ -11,6 +11,13 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -151,6 +158,80 @@ export function PasswordField<TValues extends FieldValues, TTransformed = TValue
               </Tooltip>
             </InputGroupAddon>
           </InputGroup>
+          {description ? <FieldDescription>{description}</FieldDescription> : null}
+          {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : null}
+        </Field>
+      )}
+    />
+  );
+}
+
+/** Option d'une liste déroulante. */
+export interface SelectOption {
+  value: string;
+  label: string;
+  /** Texte d'aide affiché sous le libellé */
+  hint?: string;
+}
+
+/** Propriétés de `SelectField`. */
+export type SelectFieldProps<TValues extends FieldValues, TTransformed = TValues> = BaseFieldProps<
+  TValues,
+  TTransformed
+> & {
+  options: readonly SelectOption[];
+  placeholder?: string;
+  /** Valeur envoyée quand l'utilisateur choisit l'option vide (ex. `null` = « non assigné ») */
+  emptyOption?: { label: string; value: null };
+};
+
+/** Valeur technique de l'option vide (Radix Select n'accepte pas la chaîne vide). */
+const EMPTY_SELECT_VALUE = "__empty__";
+
+/**
+ * Liste déroulante liée au formulaire.
+ *
+ * @example
+ * <SelectField control={form.control} name="nature" label="Nature" options={NATURE_OPTIONS} />
+ */
+export function SelectField<TValues extends FieldValues, TTransformed = TValues>({
+  control,
+  name,
+  label,
+  description,
+  options,
+  placeholder,
+  emptyOption,
+}: SelectFieldProps<TValues, TTransformed>) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor={name}>{label}</FieldLabel>
+          <Select
+            name={field.name}
+            value={field.value ?? (emptyOption ? EMPTY_SELECT_VALUE : undefined)}
+            onValueChange={(value) => field.onChange(value === EMPTY_SELECT_VALUE ? null : value)}
+          >
+            <SelectTrigger id={name} aria-invalid={fieldState.invalid} onBlur={field.onBlur}>
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {emptyOption ? (
+                <SelectItem value={EMPTY_SELECT_VALUE}>{emptyOption.label}</SelectItem>
+              ) : null}
+              {options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                  {option.hint ? (
+                    <span className="text-muted-foreground text-xs"> · {option.hint}</span>
+                  ) : null}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {description ? <FieldDescription>{description}</FieldDescription> : null}
           {fieldState.invalid ? <FieldError errors={[fieldState.error]} /> : null}
         </Field>

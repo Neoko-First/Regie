@@ -11,6 +11,7 @@ const UPSTREAM_TIMEOUT_MS = 30_000;
 /** En-têtes de la requête navigateur transmis à l'API ; tout le reste est filtré. */
 const FORWARDED_REQUEST_HEADERS = [
   "accept",
+  "authorization", // jeton des agents IA sur /api/mcp (les navigateurs utilisent les cookies)
   "content-type",
   "cookie", // session (access / refresh tokens httpOnly)
   "origin", // vérifié par l'API sur les requêtes mutantes (protection CSRF)

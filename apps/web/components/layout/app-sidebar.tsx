@@ -4,7 +4,7 @@ import { APP_NAME } from "@regie/shared";
 import { Clapperboard, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import {
   Sidebar,
@@ -23,12 +23,46 @@ import { isNavItemActive, NAV_ITEMS } from "./nav-items";
 import { ThemeMenu } from "./theme-menu";
 
 /**
+ * Liens de navigation principaux.
+ *
+ * @param props.activePath - Chemin courant (`null` : aucun lien mis en avant)
+ */
+function NavLinks({ activePath }: { activePath: string | null }) {
+  return (
+    <SidebarMenu>
+      {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+        <SidebarMenuItem key={href}>
+          <SidebarMenuButton
+            asChild
+            tooltip={label}
+            isActive={activePath !== null && isNavItemActive(activePath, href)}
+          >
+            <Link href={href}>
+              <Icon />
+              <span>{label}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
+
+/**
+ * Navigation avec le lien actif. Lire l'URL (`usePathname`) rend ce composant propre à chaque
+ * page : avec Cache Components, il doit être sous <Suspense> pour que la coquille commune
+ * reste prérendue (sinon le build échoue sur les routes dynamiques comme /changes/[key]).
+ */
+function ActiveNavLinks() {
+  return <NavLinks activePath={usePathname()} />;
+}
+
+/**
  * Barre latérale de l'application (shadcn `Sidebar`, variante `inset`, repliable en icônes).
  *
  * @param props.userMenu - Menu de l'utilisateur, rendu côté serveur (préchargement + Suspense)
  */
 export function AppSidebar({ userMenu }: { userMenu: ReactNode }) {
-  const pathname = usePathname();
   const openCommandPalette = useCommandPaletteStore((s) => s.setOpen);
 
   return (
@@ -68,22 +102,9 @@ export function AppSidebar({ userMenu }: { userMenu: ReactNode }) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-                <SidebarMenuItem key={href}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={label}
-                    isActive={isNavItemActive(pathname, href)}
-                  >
-                    <Link href={href}>
-                      <Icon />
-                      <span>{label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <Suspense fallback={<NavLinks activePath={null} />}>
+              <ActiveNavLinks />
+            </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

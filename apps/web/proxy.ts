@@ -24,6 +24,6 @@ export function proxy(request: NextRequest): NextResponse {
 export const config = {
   // Ni le proxy BFF (/api), ni les fichiers statiques et métadonnées
   matcher: [
-    "/((?!api|_next/static|_next/image|icon.svg|manifest.webmanifest|robots.txt|sitemap.xml).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest|robots.txt|sitemap.xml).*)",
   ],
 };

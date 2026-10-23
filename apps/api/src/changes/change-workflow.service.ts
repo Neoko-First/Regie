@@ -6,6 +6,7 @@ import {
   type TransitionRequest,
 } from "@regie/shared";
 import type { AuthContext } from "../auth/auth.types";
+import { delegationData } from "../common/delegation";
 import { conflict, forbidden } from "../common/errors/domain-errors";
 import { PrismaService } from "../prisma/prisma.service";
 import { ChangeAccessService } from "./change-access.service";
@@ -105,6 +106,7 @@ export class ChangeWorkflowService {
               from: change.status,
               to: transition.to,
               comment,
+              ...delegationData(auth),
             },
           },
         });
@@ -114,7 +116,13 @@ export class ChangeWorkflowService {
             changeId: change.id,
             actorId: auth.userId,
             type: "STATUS_CHANGED",
-            data: { transition: transition.id, from: change.status, to: transition.to, comment },
+            data: {
+              transition: transition.id,
+              from: change.status,
+              to: transition.to,
+              comment,
+              ...delegationData(auth),
+            },
           },
         });
       }

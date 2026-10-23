@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { createHash, randomBytes } from "node:crypto";
-import { ACCESS_TOKEN_TTL_MS, REFRESH_TOKEN_BYTES } from "./auth.constants";
+import { ACCESS_TOKEN_TTL_MS, OPAQUE_TOKEN_BYTES } from "./auth.constants";
 import type { AccessTokenPayload } from "./auth.types";
 
 /** Seul algorithme accepté à la vérification (empêche les attaques par changement d'algorithme). */
@@ -12,7 +12,8 @@ const MS_PER_SECOND = 1000;
 /**
  * Émission et vérification des jetons :
  * - access token : JWT signé, courte durée ;
- * - refresh token : chaîne aléatoire opaque, dont seul le hash SHA-256 est stocké en base.
+ * - jetons opaques (refresh token, jeton d'agent) : chaînes aléatoires dont seul le hash
+ *   SHA-256 est stocké en base.
  */
 @Injectable()
 export class TokenService {
@@ -49,23 +50,24 @@ export class TokenService {
   }
 
   /**
-   * Génère un refresh token aléatoire et son hash.
+   * Génère un jeton opaque aléatoire (256 bits) et son hash : refresh token ou jeton d'agent.
    *
-   * @returns Le token en clair (pour le cookie) et son hash (pour la base)
+   * @param prefix - Préfixe lisible ajouté au jeton (ex. « regie_pat_ »)
+   * @returns Le jeton en clair (à transmettre une seule fois) et son hash (pour la base)
    */
-  generateRefreshToken(): { token: string; hash: string } {
-    const token = randomBytes(REFRESH_TOKEN_BYTES).toString("base64url");
-    return { token, hash: this.hashRefreshToken(token) };
+  generateOpaqueToken(prefix = ""): { token: string; hash: string } {
+    const token = `${prefix}${randomBytes(OPAQUE_TOKEN_BYTES).toString("base64url")}`;
+    return { token, hash: this.hashOpaqueToken(token) };
   }
 
   /**
-   * Hache un refresh token. SHA-256 suffit ici : le token est aléatoire et long (256 bits),
+   * Hache un jeton opaque. SHA-256 suffit ici : le jeton est aléatoire et long (256 bits),
    * contrairement à un mot de passe qui demande un hachage lent.
    *
-   * @param token - Refresh token en clair
+   * @param token - Jeton en clair
    * @returns Son empreinte hexadécimale
    */
-  hashRefreshToken(token: string): string {
+  hashOpaqueToken(token: string): string {
     return createHash("sha256").update(token).digest("hex");
   }
 }

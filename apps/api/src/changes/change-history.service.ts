@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import type { ActivityItem, CommentItem, CreateCommentInput, RevisionItem } from "@regie/shared";
 import type { AuthContext } from "../auth/auth.types";
+import { delegationData } from "../common/delegation";
 import { toUserSummary, USER_SUMMARY_SELECT } from "../common/user-summary";
 import { PrismaService } from "../prisma/prisma.service";
 import { SpaceAccessService } from "../spaces/space-access.service";
@@ -69,7 +70,11 @@ export class ChangeHistoryService {
           changeId: change.id,
           actorId: auth.userId,
           type: "COMMENTED",
-          data: { commentId: created.id, excerpt: input.body.slice(0, COMMENT_EXCERPT_LENGTH) },
+          data: {
+            commentId: created.id,
+            excerpt: input.body.slice(0, COMMENT_EXCERPT_LENGTH),
+            ...delegationData(auth),
+          },
         },
       });
       return created;

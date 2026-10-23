@@ -11,7 +11,7 @@ import type { AuthContext } from "../auth.types";
  */
 export const CurrentAuth = createParamDecorator(
   (_data: unknown, context: ExecutionContext): AuthContext => {
-    const { auth } = context.switchToHttp().getRequest<Request>();
+    const { authContext: auth } = context.switchToHttp().getRequest<Request>();
     // Ne devrait jamais arriver : le guard global garantit sa présence hors routes publiques
     if (!auth) throw sessionExpired();
     return auth;

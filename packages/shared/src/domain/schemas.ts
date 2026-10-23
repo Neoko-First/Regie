@@ -212,3 +212,11 @@ export interface RevisionItem {
   comment: string | null;
   createdAt: string;
 }
+
+/** Contenu de « Ma boîte » : ce qui attend une action de l'utilisateur. */
+export interface InboxContent {
+  /** Évolutions dont l'utilisateur peut valider le gate en attente */
+  toValidate: ChangeSummary[];
+  /** Évolutions assignées à l'utilisateur, hors livrées et archivées */
+  assigned: ChangeSummary[];
+}

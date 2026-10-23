@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, LogOut, MonitorSmartphone, ShieldOff } from "lucide-react";
+import { Bot, ChevronsUpDown, LogOut, MonitorSmartphone, ShieldOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,22 +15,10 @@ import {
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/ui-extended/confirm-dialog";
+import { initials } from "@/components/ui-extended/user-avatar";
 import { useCurrentUser } from "../hooks/use-current-user";
 import { useLogout, useLogoutAll } from "../hooks/use-logout";
 import { LOGOUT_ALL_DESCRIPTION } from "../messages";
-
-/** Nombre de lettres affichées dans l'avatar. */
-const INITIALS_LENGTH = 2;
-
-/** Initiales d'un nom, pour l'avatar (« Paula Ordonneau » → « PO »). */
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((part) => part[0] ?? "")
-    .join("")
-    .slice(0, INITIALS_LENGTH)
-    .toUpperCase();
-}
 
 /**
  * Menu de l'utilisateur connecté (pied de la sidebar) : appareils connectés et déconnexion.
@@ -63,6 +51,11 @@ export function UserMenu() {
           <DropdownMenuItem asChild>
             <Link href="/settings/sessions">
               <MonitorSmartphone /> Appareils connectés
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/settings/agent-tokens">
+              <Bot /> Jetons d’agent
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

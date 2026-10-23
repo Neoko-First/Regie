@@ -23,6 +23,9 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Prisma 7** : l'URL de connexion vit dans `prisma.config.ts` (plus dans le schéma), le client est généré dans `apps/api/src/generated/prisma` en CommonJS et se connecte via `@prisma/adapter-pg`. `prisma init` installe des « skills » d'agents (`.agents/`, `.claude/`, `.windsurf/`) : ne pas les commiter.
 - **Build Nest** : `incremental` est désactivé dans `tsconfig.build.json`, sinon `nest start --watch` peut ne rien émettre après la suppression de `dist/`.
 - **Valeurs connues seulement côté client** (thème stocké…) : utiliser `useIsClient()` pour éviter les erreurs d'hydratation.
+- **Lire l'URL côté client** (`usePathname`, `useSearchParams`) dans un composant partagé (layout, sidebar) exige un `<Suspense>` autour, sinon le build échoue sur les routes dynamiques.
+- **Coquille** : `SidebarInset` porte `min-w-0`, sinon un contenu large (board) élargit toute la page.
+- **Ajout du plugin Tailwind typography** : redémarrer le serveur de dev après avoir modifié les `@plugin` de `globals.css`.
 - **Composants `components/ui/`** : générés par shadcn, modifiés uniquement pour la traduction française des libellés, la variante `success` du `Button` et la conformité au lint. Après un `shadcn add`, retraduire les libellés anglais.
 
 ## Authentification (phase 3)
@@ -41,6 +44,15 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Concurrence** : une transition envoie `fromStatus` ; l'API refuse (409) si le statut a changé, et la mise à jour est conditionnée au statut en base.
 - **Identifiants** : `SOC-12` = clé d'espace + numéro attribué atomiquement (`Space.changeCounter`).
 - **Administrateur de la plateforme** (`User.isPlatformAdmin`) : crée les espaces, a le rôle ADMIN partout, mais aucun rôle métier (il ne valide pas de gate à ce titre).
+
+## Serveur MCP (phase 6)
+
+- **URL** : `http://localhost:3000/api/mcp` (à travers le proxy BFF), transport HTTP « streamable » sans état, réponses JSON.
+- **Authentification** : jeton d'agent personnel (`Authorization: Bearer regie_pat_…`), créé par un humain dans « Jetons d'agent » ; stocké haché, révocable. L'agent agit avec les droits de cet humain (`AuthContext.isAgent = true`, `agentName` tracé dans l'historique).
+- **Connexion de Claude Code** : `claude mcp add --transport http regie http://localhost:3000/api/mcp --header "Authorization: Bearer <jeton>"` (commande prête à copier à la création du jeton).
+- **Outils** (`apps/api/src/mcp/mcp-server.factory.ts`) : `list_spaces`, `list_changes`, `get_change_context`, `propose_change`, `update_change`, `comment_change`, `move_change`, `request_review`. Ils appellent les MÊMES services que l'UI : ajouter un outil = réutiliser un service, jamais dupliquer une règle.
+- **Un agent ne valide jamais un gate** : refus dans `checkTransition` (`isAgent`), testé en e2e.
+- Les jetons d'agent n'ouvrent PAS l'API REST (sessions navigateur uniquement) : seulement `/mcp`.
 
 ## Versions figées volontairement
 

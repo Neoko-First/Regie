@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { ZodSerializerInterceptor, ZodValidationPipe } from "nestjs-zod";
+import { AgentTokensModule } from "./agent-tokens/agent-tokens.module";
 import { AuthModule } from "./auth/auth.module";
 import { AccessTokenGuard } from "./auth/guards/access-token.guard";
 import { ChangesModule } from "./changes/changes.module";
@@ -9,6 +10,7 @@ import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import { OriginGuard } from "./common/guards/origin.guard";
 import { AppConfigModule } from "./config/app-config.module";
 import { HealthModule } from "./health/health.module";
+import { McpModule } from "./mcp/mcp.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SpacesModule } from "./spaces/spaces.module";
 import { UsersModule } from "./users/users.module";
@@ -31,6 +33,8 @@ const THROTTLE_LIMIT = 300;
     UsersModule,
     SpacesModule,
     ChangesModule,
+    AgentTokensModule,
+    McpModule,
   ],
   providers: [
     // Validation des entrées par les DTO Zod partagés (createZodDto)
