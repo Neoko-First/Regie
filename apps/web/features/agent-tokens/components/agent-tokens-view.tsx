@@ -6,10 +6,9 @@ import {
   type CreatedAgentToken,
   createAgentTokenSchema,
 } from "@regie/shared";
-import { Bot, Copy, KeyRound, Plus, ShieldOff } from "lucide-react";
+import { Bot, Copy, Plus, ShieldOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,11 +34,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Callout } from "@/components/ui-extended/callout";
 import { ConfirmDialog } from "@/components/ui-extended/confirm-dialog";
 import { FormDialog } from "@/components/ui-extended/form-dialog";
 import { SelectField, TextField } from "@/components/ui-extended/form-fields";
 import { IconButton } from "@/components/ui-extended/icon-button";
 import { formatDate, formatRelative } from "@/lib/format";
+import { notifyError } from "@/lib/notify";
 import {
   useAgentTokens,
   useCreateAgentToken,
@@ -66,7 +67,7 @@ async function copy(text: string, label: string): Promise<void> {
     await navigator.clipboard.writeText(text);
     toast.success(`${label} copié`);
   } catch {
-    toast.error("Copie impossible : sélectionnez le texte et copiez-le manuellement.");
+    notifyError("Copie impossible : sélectionnez le texte et copiez-le manuellement.");
   }
 }
 
@@ -74,7 +75,7 @@ async function copy(text: string, label: string): Promise<void> {
 function CopyBlock({ value, label }: { value: string; label: string }) {
   return (
     <div className="bg-muted flex items-start gap-2 rounded-md p-2">
-      <code className="min-w-0 flex-1 font-mono text-xs break-all">{value}</code>
+      <code className="text-code-sm min-w-0 flex-1 break-all">{value}</code>
       <IconButton
         label={`Copier : ${label.toLowerCase()}`}
         size="icon-xs"
@@ -108,14 +109,9 @@ function TokenCreatedDialog({
             L’agent agira en votre nom, avec vos droits, mais ne pourra jamais valider un gate.
           </DialogDescription>
         </DialogHeader>
-        <Alert>
-          <KeyRound />
-          <AlertTitle>Copiez ce jeton maintenant</AlertTitle>
-          <AlertDescription>
-            Il ne sera plus jamais affiché. Ne le partagez pas : il donne accès à Régie en votre
-            nom.
-          </AlertDescription>
-        </Alert>
+        <Callout tone="warning" title="Copiez ce jeton maintenant">
+          Il ne sera plus jamais affiché. Ne le partagez pas : il donne accès à Régie en votre nom.
+        </Callout>
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">Jeton</span>
           <CopyBlock value={created.token} label="Jeton" />
@@ -221,9 +217,7 @@ export function AgentTokensList() {
           {tokens.map((token) => (
             <TableRow key={token.id}>
               <TableCell className="font-medium">{token.name}</TableCell>
-              <TableCell className="text-muted-foreground font-mono text-xs">
-                {token.prefix}…
-              </TableCell>
+              <TableCell className="text-muted-foreground text-code-sm">{token.prefix}…</TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {token.lastUsedAt ? (
                   <time dateTime={token.lastUsedAt} suppressHydrationWarning>

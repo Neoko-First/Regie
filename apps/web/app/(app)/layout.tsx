@@ -27,7 +27,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         }
       />
       {/* min-w-0 : un contenu large (board) défile dans la page au lieu d'élargir la coquille */}
-      <SidebarInset className="min-w-0">{children}</SidebarInset>
+      <SidebarInset className="bg-card min-w-0">{children}</SidebarInset>
       <CommandPalette />
       {/* Modale « Nouvelle évolution », ouverte depuis les pages et la palette ⌘K */}
       <Suspense fallback={null}>

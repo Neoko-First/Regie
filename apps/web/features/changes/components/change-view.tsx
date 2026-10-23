@@ -142,8 +142,8 @@ export function ChangeView({ changeKey }: { changeKey: string }) {
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-2">
-            <span className="text-muted-foreground font-mono text-sm">{change.key}</span>
-            <h2 className="text-xl font-semibold">{change.title}</h2>
+            <span className="text-muted-foreground text-code-sm">{change.key}</span>
+            <h2 className="text-h3">{change.title}</h2>
           </div>
           <div className="flex items-center gap-2">
             <TransitionActions change={change} />
@@ -172,7 +172,7 @@ export function ChangeView({ changeKey }: { changeKey: string }) {
           </div>
         </div>
 
-        <dl className="bg-muted/40 grid grid-cols-2 gap-4 rounded-lg p-4 sm:grid-cols-3 lg:grid-cols-6">
+        <dl className="bg-muted rounded-card grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 lg:grid-cols-6">
           <Meta label="Statut">
             <StatusBadge status={change.status} />
           </Meta>
@@ -205,7 +205,7 @@ export function ChangeView({ changeKey }: { changeKey: string }) {
 
       <Tabs defaultValue="proposal">
         {/* Sur petit écran, les onglets défilent au lieu d'élargir la page */}
-        <TabsList className="max-w-full justify-start overflow-x-auto">
+        <TabsList className="max-w-full justify-start overflow-x-auto overflow-y-hidden">
           {MARKDOWN_TABS.map((tab) => (
             <TabsTrigger key={tab.field} value={tab.field}>
               {tab.label}

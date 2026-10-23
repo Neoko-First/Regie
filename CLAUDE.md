@@ -276,13 +276,21 @@ export function optimisticHandlers<TData, TVariables>(
 - Besoin d'un comportement en plus ? On **étend** le composant (wrapper dans `components/ui-extended/` ou variante `cva`), sans modifier la logique interne de `components/ui/` sauf nécessité documentée.
 - Sidebar : composant `Sidebar` de shadcn en **`variant="inset"`**, avec `SidebarProvider`, `SidebarInset` et `SidebarTrigger`.
 
+### Design system
+- Régie suit le **design system d'Alexandre** (base tweakcn Claymorphism, contrastes corrigés) : https://claude.ai/artifact/7CrGUmWy4BKHJmnbeHK5r8. Ses tokens sont reportés dans `apps/web/app/globals.css` (version notée en tête du bloc) : pour suivre une nouvelle version, reporter ses valeurs à cet endroit.
+- Polices : **Plus Jakarta Sans** (texte), **Roboto Mono** (code, identifiants comme `SOC-12`). Échelle typographique en utilitaires : `text-h1`… `text-h4`, `text-body`, `text-body-sm`, `text-label`, `text-caption`, `text-code-sm`.
+- Arrondis sémantiques : `rounded-control` (champs, tableaux, éléments denses), `rounded-button`, `rounded-dialog`, `rounded-card`, `rounded-full` (pastilles). Ombres « clay » : `shadow-sm` (boutons pleins), `shadow-md` (carte mise en avant), `shadow-lg` (menus, toasts), `shadow-xl` (dialogues). Une carte a un contour OU une ombre.
+- Densité : boutons et champs de 40 px, 32 px en `size="sm"` (tableaux, barres d'outils).
+- Fond de page `background`, contenus sur `card` ; `accent` (lilas) réservé au survol et à la sélection.
+- Ton : vouvoiement (outil d'équipe). Un bouton dit ce qu'il fait (« Créer l'évolution ») ; un toast confirme au participe passé (« Évolution créée »).
+
 ### Couleurs
 - **Uniquement des variables CSS** (tokens définis dans `globals.css`, utilisées via les classes Tailwind sémantiques : `bg-primary`, `text-muted-foreground`, `border-destructive`…).
 - **Interdit :** couleurs en dur (`#fff`, `rgb()`, `bg-green-500`, `text-red-600`, valeurs arbitraires `bg-[#...]`, `style={{ color }}`).
 - Couleurs d'action logiques :
   - **Vert (`success`)** → validation / écriture (créer, enregistrer).
   - **Rouge (`destructive`)** → danger zone / action impactante (supprimer, révoquer, réinitialiser).
-- shadcn ne fournit pas de token vert : ajouter `--success` et `--success-foreground` dans `:root` et `.dark`, les exposer dans le thème Tailwind, puis ajouter une variante `success` au `Button` via `cva`.
+- Statuts : `success`, `warning`, `info`, `destructive` (+ `-foreground`), exposés dans le thème Tailwind ; variantes correspondantes sur `Badge` (avec `dot` pour un statut) et `success` sur `Button`. Encadrés : composant `Callout` (`components/ui-extended/callout.tsx`). Jamais de sens porté par la couleur seule.
 - Tout nouveau besoin de couleur = nouveau token, jamais une valeur ponctuelle.
 
 ### Icônes
