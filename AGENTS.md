@@ -9,11 +9,26 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 
 ## Règles de travail
 
-- Une branche par tâche (`feat/`, `fix/`, `chore/`, `refactor/`), jamais de push direct sur `main`, PR obligatoire.
-- Commits Conventional Commits, rédigés en français.
+- Une branche par tâche (`feat/`, `fix/`, `chore/`, `refactor/`, `docs/`), **partie de `develop`**, PR obligatoire vers `develop`. Voir [Workflow Git](#workflow-git).
+- Commits Conventional Commits, rédigés en français, avec un scope (`feat(web): …`, `fix(api): …`).
 - Code en anglais ; commentaires, JSDoc, documentation et textes UI en français.
 - Avant de proposer une PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` et `pnpm build` passent.
 - **Relecture humaine obligatoire, sans auto-merge** pour toute PR touchant l'authentification, les permissions, les gates ou le MCP (D-054).
+
+## Workflow Git
+
+| Branche                                              | Rôle                                                        | Protection (rulesets GitHub)                                                                                          |
+| ---------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `main`                                               | Production : chaque merge est une release taguée (`vX.Y.Z`) | PR obligatoire depuis `develop`, **merge commit** uniquement, CI verte et à jour, pas de force push ni de suppression |
+| `develop`                                            | Intégration (branche par défaut)                            | PR obligatoire, **squash** uniquement, CI verte, pas de force push ni de suppression                                  |
+| `feat/*`, `fix/*`, `chore/*`, `refactor/*`, `docs/*` | Une tâche                                                   | Partent de `develop`, supprimées après merge                                                                          |
+
+- **Feature** : branche depuis `develop` → PR vers `develop` (titre de PR en Conventional Commits : il devient le message du commit squashé) → CI verte → squash.
+- **Release** : PR `develop` → `main` intitulée `release: vX.Y.Z — <résumé>`, merge commit, puis tag `vX.Y.Z` et release GitHub.
+- **Correctif urgent en production** : branche `fix/*` depuis `main`, PR vers `main`, puis report dans `develop` par une PR `main` → `develop`.
+- Personne ne contourne les protections, administrateurs compris. Les discussions de relecture doivent être résolues avant merge.
+- Auto-merge possible (`gh pr merge --auto --squash`) sauf pour l'auth, les permissions, les gates et le MCP (D-054).
+- Évolution prévue : une branche `preprod` quand un environnement de préproduction existera (états de livraison `develop → preprod → prod`, REGIE.md §6).
 
 ## Pièges connus
 

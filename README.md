@@ -58,4 +58,4 @@ docs/         # Document de référence et pitch
 | `pnpm format`                                | Formate le dépôt avec Prettier                  |
 | `pnpm db:up` / `pnpm db:down`                | Démarre / arrête PostgreSQL et Mailpit          |
 
-Les commits suivent [Conventional Commits](https://www.conventionalcommits.org/fr/) (vérifié par commitlint).
+Les commits suivent [Conventional Commits](https://www.conventionalcommits.org/fr/) (vérifié par commitlint). Le travail se fait sur des branches issues de `develop` (branche par défaut) ; `main` ne reçoit que des releases : voir [AGENTS.md](AGENTS.md#workflow-git).
