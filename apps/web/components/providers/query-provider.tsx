@@ -4,9 +4,9 @@ import { MutationCache, QueryCache, type QueryClient } from "@tanstack/react-que
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { ReactNode } from "react";
-import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/api-client";
 import { MESSAGES } from "@/lib/messages";
+import { notifyError } from "@/lib/notify";
 import { makeQueryClient } from "@/lib/query-client";
 
 let browserQueryClient: QueryClient | undefined;
@@ -18,13 +18,13 @@ function makeBrowserQueryClient(): QueryClient {
       onError: (_error, query) => {
         // Premier chargement en échec : c'est l'état d'erreur de la page qui l'affiche.
         // Échec d'un rafraîchissement en arrière-plan : les données restent affichées, on prévient.
-        if (query.state.data !== undefined) toast.error(MESSAGES.errors.refresh);
+        if (query.state.data !== undefined) notifyError(MESSAGES.errors.refresh);
       },
     }),
     mutationCache: new MutationCache({
       onError: (error, _variables, _onMutateResult, mutation) => {
         if (mutation.meta?.skipGlobalErrorToast) return;
-        toast.error(getErrorMessage(error));
+        notifyError(getErrorMessage(error));
       },
     }),
   });

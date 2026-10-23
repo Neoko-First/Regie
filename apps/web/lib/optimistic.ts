@@ -1,6 +1,7 @@
 import type { MutationFunctionContext, QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { getErrorMessage } from "./api-client";
+import { notifyError } from "./notify";
 
 // Cycle de mutation optimiste factorisé (CLAUDE.md §6.3) :
 // onMutate (snapshot + mise à jour immédiate) → onError (rollback + toast)
@@ -94,7 +95,7 @@ export function optimisticHandlers<TData, TVariables>({
     ) => {
       // Rollback : on restaure l'état d'avant la mutation
       client.setQueryData(queryKey, snapshot?.previous);
-      toast.error(messages.error ?? getErrorMessage(error));
+      notifyError(messages.error ?? getErrorMessage(error));
     },
 
     onSuccess: () => {

@@ -68,7 +68,7 @@ export function ChangesTableView({
       <TableBody>
         {changes.map((change) => (
           <TableRow key={change.id} className={cn(isTempId(change.id) && "opacity-60")}>
-            <TableCell className="text-muted-foreground font-mono text-xs">{change.key}</TableCell>
+            <TableCell className="text-muted-foreground text-code-sm">{change.key}</TableCell>
             <TableCell className="max-w-md truncate font-medium">
               <ChangeLink changeId={change.id} changeKey={change.key} className="hover:underline">
                 {change.title}

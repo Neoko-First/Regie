@@ -42,7 +42,7 @@ export function CreateChangeDialog() {
         priority: "MEDIUM",
         proposal: "",
       }}
-      submitLabel="Créer"
+      submitLabel="Créer l’évolution"
       onSubmit={(values) => createChange.mutate(values)}
     >
       {(form) => (

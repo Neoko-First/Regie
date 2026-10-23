@@ -27,7 +27,7 @@ function ChangeCard({ change }: { change: ChangeSummary }) {
         )}
       >
         <div className="flex items-center justify-between gap-2">
-          <span className="text-muted-foreground font-mono text-xs">{change.key}</span>
+          <span className="text-muted-foreground text-code-sm">{change.key}</span>
           <PriorityIndicator priority={change.priority} />
         </div>
         <p className="line-clamp-3 text-sm font-medium">{change.title}</p>
@@ -57,10 +57,10 @@ export function ChangesBoard({ filters }: { filters: ChangeFilters }) {
           <section
             key={status}
             aria-label={CHANGE_STATUS_LABELS[status]}
-            className="bg-muted/40 flex w-72 shrink-0 flex-col gap-2 rounded-xl p-2"
+            className="bg-muted rounded-card flex w-72 shrink-0 flex-col gap-2 p-2"
           >
             <header className="flex items-center justify-between px-1 py-0.5">
-              <h2 className="text-sm font-medium">{CHANGE_STATUS_LABELS[status]}</h2>
+              <h2 className="text-label">{CHANGE_STATUS_LABELS[status]}</h2>
               <span className="text-muted-foreground text-xs">{column.length}</span>
             </header>
             <ul className="flex flex-col gap-2">

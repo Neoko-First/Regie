@@ -10,10 +10,25 @@ import { ArrowDown, ArrowUp, ChevronsUp, Equal, type LucideIcon } from "lucide-r
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-/** Badge du statut d'une évolution. */
+/**
+ * Ton de chaque statut (design system : success, warning, info, neutre) :
+ * en attente d'un gate humain = warning, en cours = info, recetté ou livré = success.
+ */
+const STATUS_TONES: Record<ChangeStatus, "secondary" | "info" | "warning" | "success"> = {
+  DRAFT: "secondary",
+  IN_REVIEW: "warning",
+  DESIGN: "warning",
+  IN_DEVELOPMENT: "info",
+  IN_TESTING: "warning",
+  ACCEPTED: "success",
+  DELIVERED: "success",
+  ARCHIVED: "secondary",
+};
+
+/** Badge du statut d'une évolution (pastille avec point : c'est un statut). */
 export function StatusBadge({ status }: { status: ChangeStatus }) {
   return (
-    <Badge variant={status === "DRAFT" ? "outline" : "secondary"}>
+    <Badge variant={STATUS_TONES[status]} dot>
       {CHANGE_STATUS_LABELS[status]}
     </Badge>
   );

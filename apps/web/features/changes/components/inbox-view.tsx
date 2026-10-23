@@ -14,13 +14,13 @@ export function InboxView() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-3" aria-labelledby="inbox-validate">
-        <h2 id="inbox-validate" className="text-base font-semibold">
+        <h2 id="inbox-validate" className="text-h4">
           À valider <span className="text-muted-foreground font-normal">({toValidate.length})</span>
         </h2>
         <ChangesTableView changes={toValidate} emptyText="Aucun gate n’attend votre validation." />
       </section>
       <section className="flex flex-col gap-3" aria-labelledby="inbox-assigned">
-        <h2 id="inbox-assigned" className="text-base font-semibold">
+        <h2 id="inbox-assigned" className="text-h4">
           Assignées à moi{" "}
           <span className="text-muted-foreground font-normal">({assigned.length})</span>
         </h2>

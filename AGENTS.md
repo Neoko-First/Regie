@@ -17,11 +17,11 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 
 ## Workflow Git
 
-| Branche                                              | Rôle                                                        | Protection (rulesets GitHub)                                                                                          |
-| ---------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `main`                                               | Production : chaque merge est une release taguée (`vX.Y.Z`) | PR obligatoire depuis `develop`, **merge commit** uniquement, CI verte et à jour, pas de force push ni de suppression |
-| `develop`                                            | Intégration (branche par défaut)                            | PR obligatoire, **squash** uniquement, CI verte, pas de force push ni de suppression                                  |
-| `feat/*`, `fix/*`, `chore/*`, `refactor/*`, `docs/*` | Une tâche                                                   | Partent de `develop`, supprimées après merge                                                                          |
+| Branche                                              | Rôle                                                        | Protection (rulesets GitHub)                                                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `main`                                               | Production : chaque merge est une release taguée (`vX.Y.Z`) | PR obligatoire depuis `develop`, **merge commit** uniquement, CI verte, pas de force push ni de suppression |
+| `develop`                                            | Intégration (branche par défaut)                            | PR obligatoire, **squash** uniquement, CI verte, pas de force push ni de suppression                        |
+| `feat/*`, `fix/*`, `chore/*`, `refactor/*`, `docs/*` | Une tâche                                                   | Partent de `develop`, supprimées après merge                                                                |
 
 - **Feature** : branche depuis `develop` → PR vers `develop` (titre de PR en Conventional Commits : il devient le message du commit squashé) → CI verte → squash.
 - **Release** : PR `develop` → `main` intitulée `release: vX.Y.Z — <résumé>`, merge commit, puis tag `vX.Y.Z` et release GitHub.
@@ -41,7 +41,7 @@ Ce dépôt est développé en grande partie par des agents IA (D-053). Ce fichie
 - **Lire l'URL côté client** (`usePathname`, `useSearchParams`) dans un composant partagé (layout, sidebar) exige un `<Suspense>` autour, sinon le build échoue sur les routes dynamiques.
 - **Coquille** : `SidebarInset` porte `min-w-0`, sinon un contenu large (board) élargit toute la page.
 - **Ajout du plugin Tailwind typography** : redémarrer le serveur de dev après avoir modifié les `@plugin` de `globals.css`.
-- **Composants `components/ui/`** : générés par shadcn, modifiés uniquement pour la traduction française des libellés, la variante `success` du `Button` et la conformité au lint. Après un `shadcn add`, retraduire les libellés anglais.
+- **Composants `components/ui/`** : générés par shadcn, puis adaptés au design system (Button, Badge, Card, Input, Select, Textarea, InputGroup, Toggle, Table, Dialog, AlertDialog, menus : densité, arrondis, ombres, variantes de statut ; chaque écart est commenté), traduits en français et rendus conformes au lint. Un `shadcn add --overwrite` écraserait ces adaptations : fusionner à la main. Après un `shadcn add`, retraduire les libellés anglais.
 
 ## Authentification (phase 3)
 
