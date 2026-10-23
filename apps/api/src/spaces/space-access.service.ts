@@ -36,6 +36,18 @@ export class SpaceAccessService {
   }
 
   /**
+   * Vérifie qu'un utilisateur est administrateur de la plateforme (administration globale).
+   *
+   * @param userId - Utilisateur
+   * @throws AppException 403 sinon
+   */
+  async assertPlatformAdmin(userId: string): Promise<void> {
+    if (!(await this.isPlatformAdmin(userId))) {
+      throw forbidden("Réservé à l'administrateur de la plateforme.");
+    }
+  }
+
+  /**
    * Rôles d'un utilisateur dans un espace (vide s'il n'en est pas membre).
    *
    * @param userId - Utilisateur

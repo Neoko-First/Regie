@@ -4,6 +4,7 @@ const VALID_ENV = {
   DATABASE_URL: "postgresql://regie:regie@localhost:5433/regie",
   WEB_ORIGIN: "http://localhost:3000",
   JWT_ACCESS_SECRET: "s".repeat(32),
+  SETTINGS_ENCRYPTION_KEY: Buffer.alloc(32).toString("base64"),
 };
 
 describe("validateEnv", () => {

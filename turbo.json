@@ -1,7 +1,13 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalPassThroughEnv": ["DATABASE_URL", "WEB_ORIGIN", "JWT_ACCESS_SECRET", "NODE_ENV"],
+  "globalPassThroughEnv": [
+    "DATABASE_URL",
+    "JWT_ACCESS_SECRET",
+    "NODE_ENV",
+    "SETTINGS_ENCRYPTION_KEY",
+    "WEB_ORIGIN"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
