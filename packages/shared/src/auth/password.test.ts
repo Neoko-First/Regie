@@ -3,7 +3,10 @@ import {
   emailSchema,
   evaluatePassword,
   isPasswordDifferentFromEmail,
+  mailSettingsSchema,
   passwordSchema,
+  changePasswordSchema,
+  resetPasswordSchema,
 } from "../index";
 
 describe("politique de mot de passe", () => {
@@ -48,5 +51,41 @@ describe("emailSchema", () => {
     expect(emailSchema.safeParse("alice").error?.issues[0]?.message).toBe(
       "Saisissez une adresse email valide.",
     );
+  });
+});
+
+describe("parcours de mot de passe", () => {
+  it("exige que la confirmation corresponde", () => {
+    const result = resetPasswordSchema.safeParse({
+      token: "t",
+      password: "Clapperboard-2026",
+      passwordConfirm: "Clapperboard-2027",
+    });
+    expect(result.error?.issues[0]?.path).toEqual(["passwordConfirm"]);
+  });
+
+  it("refuse un nouveau mot de passe identique à l'actuel", () => {
+    const result = changePasswordSchema.safeParse({
+      currentPassword: "Clapperboard-2026",
+      newPassword: "Clapperboard-2026",
+      newPasswordConfirm: "Clapperboard-2026",
+    });
+    expect(result.error?.issues[0]?.message).toBe(
+      "Le nouveau mot de passe doit être différent de l'actuel.",
+    );
+  });
+});
+
+describe("réglages Mailjet", () => {
+  it("considère une clé vide comme « ne pas modifier »", () => {
+    const parsed = mailSettingsSchema.parse({
+      senderEmail: "no-reply@xotis.fr",
+      senderName: "Régie",
+      enabled: true,
+      apiKey: "",
+      secretKey: "   ",
+    });
+    expect(parsed.apiKey).toBeUndefined();
+    expect(parsed.secretKey).toBeUndefined();
   });
 });
